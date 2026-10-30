@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { admin } from "./db";
+import { admin, signInStaff } from "./db";
 import { signInExisting } from "./existing-user";
-import { totp } from "./totp";
 
 test("discover shows curated, trending, shorts and genre shelves with prices", async ({ page }) => {
   await page.goto("/discover");
@@ -62,18 +61,9 @@ test("a viewer gets 'because you watched' and makes a list", async ({ page }) =>
 });
 
 test("staff curate a shelf behind two-factor sign-in", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop", "one TOTP enrolment at a time for the shared staff user");
+  test.skip(info.project.name !== "desktop", "one run is enough for shared shelves");
   test.slow();
-  const staff = await signInExisting(page, "staff@umoobi.test", "/staff/shelves");
-  const { data: factors } = await admin.auth.admin.mfa.listFactors({ userId: staff.id });
-  for (const f of factors?.factors ?? []) await admin.auth.admin.mfa.deleteFactor({ id: f.id, userId: staff.id });
-  await page.goto("/staff/shelves");
-
-  await expect(page).toHaveURL(/\/settings\/security/);
-  const keyText = await page.getByText(/Or enter this key:/).textContent();
-  const secret = keyText!.replace(/.*key:\s*/, "").trim();
-  await page.getByLabel("6-digit code").fill(totp(secret));
-  await page.getByRole("button", { name: "Verify" }).click();
+  const staff = await signInStaff(page, "/staff/shelves");
   await expect(page.getByRole("heading", { name: "Featured shelves" })).toBeVisible();
 
   const shelf = `E2E shelf ${Date.now()}`;
@@ -92,7 +82,5 @@ test("staff curate a shelf behind two-factor sign-in", async ({ page }, info) =>
     expect(log!.map((l) => l.action)).toEqual(["shelf.add_film", "shelf.create"]);
   } finally {
     await admin.from("shelves").delete().eq("title", shelf);
-    const { data: after } = await admin.auth.admin.mfa.listFactors({ userId: staff.id });
-    for (const f of after?.factors ?? []) await admin.auth.admin.mfa.deleteFactor({ id: f.id, userId: staff.id });
   }
 });
