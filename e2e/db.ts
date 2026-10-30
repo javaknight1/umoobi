@@ -21,18 +21,24 @@ export const admin = createClient<Database>(e.NEXT_PUBLIC_SUPABASE_URL, e.SUPABA
 
 /** Creates (or reuses) a user and signs the browser in through a one-time magic link. */
 export async function signInAs(page: Page, email: string, opts: { roles?: string[]; next?: string } = {}) {
-  const { data: existing } = await admin.auth.admin.listUsers();
-  let user = existing.users.find((u) => u.email === email);
-  if (!user) {
-    const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true, user_metadata: { birth_year: 1990 } });
-    if (error) throw error;
-    user = data.user;
+  let user: { id: string } | null = null;
+  // Phone and desktop runs can sign in as the same seed user at once; a newer link
+  // invalidates the older one, so retry a few times.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    let link = await admin.auth.admin.generateLink({ type: "magiclink", email });
+    if (link.error) {
+      const { error } = await admin.auth.admin.createUser({ email, email_confirm: true, user_metadata: { birth_year: 1990 } });
+      if (error && !/already/i.test(error.message)) throw error;
+      link = await admin.auth.admin.generateLink({ type: "magiclink", email });
+      if (link.error) throw link.error;
+    }
+    user = link.data.user!;
+    if (opts.roles) await admin.from("profiles").update({ roles: opts.roles }).eq("id", user.id);
+    const q = new URLSearchParams({ token_hash: link.data.properties!.hashed_token, type: "email", next: opts.next ?? "/" });
+    await page.goto(`/auth/callback?${q}`);
+    await page.waitForURL((u) => !u.pathname.startsWith("/auth/"));
+    if (!new URL(page.url()).searchParams.has("error")) return user;
+    await page.waitForTimeout(200 + Math.random() * 800);
   }
-  if (opts.roles) await admin.from("profiles").update({ roles: opts.roles }).eq("id", user.id);
-  const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
-  if (error) throw error;
-  const q = new URLSearchParams({ token_hash: data.properties.hashed_token, type: "magiclink", next: opts.next ?? "/" });
-  await page.goto(`/auth/callback?${q}`);
-  await page.waitForURL((u) => !u.pathname.startsWith("/auth/"));
-  return user;
+  throw new Error(`Could not sign in as ${email}`);
 }

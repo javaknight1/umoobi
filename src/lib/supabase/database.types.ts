@@ -230,6 +230,7 @@ export type Database = {
         Row: {
           created_at: string
           duration_seconds: number | null
+          error_message: string | null
           film_id: string
           id: string
           kind: string
@@ -244,6 +245,7 @@ export type Database = {
         Insert: {
           created_at?: string
           duration_seconds?: number | null
+          error_message?: string | null
           film_id: string
           id?: string
           kind: string
@@ -258,6 +260,7 @@ export type Database = {
         Update: {
           created_at?: string
           duration_seconds?: number | null
+          error_message?: string | null
           film_id?: string
           id?: string
           kind?: string
@@ -1401,9 +1404,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_sales: {
+        Args: { a: string; p_from: string; p_to: string }
+        Returns: {
+          fee_cents: number
+          film_id: string
+          film_title: string
+          kind: string
+          net_cents: number
+          order_ref: string
+          paid_at: string
+          price_cents: number
+          processing_cents: number
+          refunded_at: string
+          status: string
+          tax_cents: number
+        }[]
+      }
       available_balance_cents: {
         Args: { a: string; on_date?: string }
         Returns: number
+      }
+      because_you_watched: {
+        Args: { p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
       }
       can_manage_film: { Args: { f: string }; Returns: boolean }
       can_review: { Args: { f: string }; Returns: boolean }
@@ -1427,6 +1454,46 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      claim_jobs_of: {
+        Args: { p_kinds: string[]; p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          id: number
+          kind: string
+          last_error: string | null
+          payload: Json
+          run_after: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_person: { Args: { p_token: string }; Returns: string }
+      create_monthly_payouts: {
+        Args: { p_period_end: string; p_period_start: string }
+        Returns: {
+          account_id: string
+          amount_cents: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          status: string
+          stripe_transfer_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "payouts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       credit_shares_ok: { Args: { f: string }; Returns: boolean }
       estimated_processing_cents: { Args: { total: number }; Returns: number }
       fee_cents: {
@@ -1436,6 +1503,13 @@ export type Database = {
       film_is_public: { Args: { f: string }; Returns: boolean }
       film_is_purchasable: { Args: { f: string }; Returns: boolean }
       film_kind: { Args: { runtime_seconds: number }; Returns: string }
+      film_rating: {
+        Args: { p_film: string }
+        Returns: {
+          average: number
+          count: number
+        }[]
+      }
       films_used: {
         Args: { a: string; kind: string; yr: number }
         Returns: number
@@ -1446,6 +1520,18 @@ export type Database = {
       }
       has_role: { Args: { r: string }; Returns: boolean }
       is_account_member: { Args: { a: string }; Returns: boolean }
+      mark_payout_paid: {
+        Args: { p_payout: string; p_transfer: string }
+        Returns: undefined
+      }
+      my_balance_cents: {
+        Args: { a: string; on_date?: string }
+        Returns: number
+      }
+      my_films_used: {
+        Args: { a: string; kind: string; yr: number }
+        Returns: number
+      }
       order_ledger_mismatches: {
         Args: never
         Returns: {
@@ -1471,7 +1557,63 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_transfer_reversal: {
+        Args: { p_account: string; p_amount: number; p_payout: string }
+        Returns: undefined
+      }
       requeue_stale_jobs: { Args: never; Returns: number }
+      rollup_film_day: { Args: { p_day: string }; Returns: number }
+      save_credits: {
+        Args: { p_credits: Json; p_film: string }
+        Returns: undefined
+      }
+      search_films: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          film_id: string
+          rank: number
+        }[]
+      }
+      search_people: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          person_id: string
+          rank: number
+        }[]
+      }
+      set_film_offers: {
+        Args: {
+          f: string
+          p_buy_cents: number
+          p_rent_cents: number
+          p_rent_hours: number
+        }
+        Returns: {
+          active: boolean
+          created_at: string
+          film_id: string
+          id: string
+          kind: string
+          price_cents: number
+          rental_hours: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "offers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      staff_account_balances: {
+        Args: never
+        Returns: {
+          balance_cents: number
+          display_name: string
+          id: string
+          payout_hold: boolean
+          payouts_enabled: boolean
+        }[]
+      }
       start_playback: {
         Args: { f: string }
         Returns: {
@@ -1493,6 +1635,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      trending_films: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
+      }
+      upgrade_tiers: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

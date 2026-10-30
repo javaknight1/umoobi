@@ -9,11 +9,19 @@ export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
   workers: process.env.CI ? 2 : 4,
+  timeout: 60_000,
   expect: { timeout: 15_000 },
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
     { name: "phone", use: { ...devices["Pixel 7"] } },
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
-  webServer: { command: `pnpm exec next dev -p ${port}`, url: baseURL, reuseExistingServer: true, timeout: 120_000 },
+  // Staff pages need TOTP (aal2); e2e can't scan a QR code, so the test server skips that one check.
+  webServer: {
+    command: `pnpm exec next dev -p ${port}`,
+    url: baseURL,
+    reuseExistingServer: true,
+    timeout: 120_000,
+    env: { STAFF_REQUIRE_2FA: "false" },
+  },
 });
