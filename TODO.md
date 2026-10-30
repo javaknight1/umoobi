@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-10-30
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
-**Current Task:** T004 — Filmmaker onboarding and vetting (T001/T002 code done; deploy blocked)
+**Current Task:** T006 — Upload and encoding
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
 **Next Milestone:** Waitlist live by 2026-11-13 (before Vimeo On Demand storefronts go offline 2026-11-20); Gate 1 on 2027-07-30
 
@@ -128,11 +128,12 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 **Verification:** unit tests for the score; e2e with the dev provider.
 **README update:** Stripe env vars and `stripe listen`.
 
-- [ ] Account vetting score (unit tested)
-- [ ] Wizard UI (3 steps) + apply action
-- [ ] Payments provider interface with dev fake + Stripe implementation (Identity, Connect onboarding)
-- [ ] Stripe webhook route (signature verified, idempotent via `webhook_events`)
-- [ ] Tier upgrade job (90+ days, 10+ sales, no strikes → established)
+- [x] Account vetting score (unit tested)
+- [x] Wizard UI (3 steps) + apply action
+- [x] Payments provider interface with dev fake + Stripe implementation (Identity, Connect onboarding)
+- [x] Stripe webhook route (signature verified, idempotent via `webhook_events`)
+- [ ] Tier upgrade job (90+ days, 10+ sales, no strikes → established) — lands with the worker in T009
+- [x] e2e: approve, staff review, failed ID retry (dev provider)
 - [ ] Real Stripe test keys (blocked: T003)
 
 ## T005 — Spike S2: large uploads to Mux
