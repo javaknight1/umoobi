@@ -3,6 +3,9 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(37);
 
+-- Start from an empty database (seed data is restored by the rollback).
+truncate auth.users, public.waitlist_signups, public.shelves, public.jobs, public.webhook_events cascade;
+
 -- Maya (filmmaker), Jordan (viewer), Kid (too young).
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000000a', 'maya@umoobi.test'),

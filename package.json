@@ -12,7 +12,8 @@
     "test:db": "supabase test db",
     "e2e": "playwright test",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
-    "env:local": "./scripts/env-local.sh"
+    "env:local": "./scripts/env-local.sh",
+    "worker": "node scripts/worker.mjs"
   },
   "dependencies": {
     "@mux/mux-node": "^15.5.0",

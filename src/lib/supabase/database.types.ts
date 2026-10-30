@@ -1408,6 +1408,25 @@ export type Database = {
       can_manage_film: { Args: { f: string }; Returns: boolean }
       can_review: { Args: { f: string }; Returns: boolean }
       cap_for: { Args: { kind: string; tier: string }; Returns: number }
+      claim_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          id: number
+          kind: string
+          last_error: string | null
+          payload: Json
+          run_after: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       credit_shares_ok: { Args: { f: string }; Returns: boolean }
       estimated_processing_cents: { Args: { total: number }; Returns: number }
       fee_cents: {
@@ -1420,6 +1439,10 @@ export type Database = {
       films_used: {
         Args: { a: string; kind: string; yr: number }
         Returns: number
+      }
+      finish_job: {
+        Args: { p_error?: string; p_id: number }
+        Returns: undefined
       }
       has_role: { Args: { r: string }; Returns: boolean }
       is_account_member: { Args: { a: string }; Returns: boolean }
@@ -1448,6 +1471,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      requeue_stale_jobs: { Args: never; Returns: number }
       start_playback: {
         Args: { f: string }
         Returns: {
