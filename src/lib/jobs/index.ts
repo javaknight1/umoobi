@@ -12,11 +12,16 @@ export async function enqueue(kind: string, payload: JobPayload = {}, runAfter?:
   if (error) throw new Error(`enqueue ${kind}: ${error.message}`);
 }
 
-/** Claims and runs up to `limit` jobs. Unknown kinds fail so they show up in staff tools. */
-export async function runJobs(limit = 10): Promise<{ ran: number; failed: number }> {
+/**
+ * Claims and runs up to `limit` jobs, optionally only some kinds. Unknown kinds fail so they
+ * show up in staff tools.
+ */
+export async function runJobs(limit = 10, kinds?: string[]): Promise<{ ran: number; failed: number }> {
   const db = createAdminClient();
   await db.rpc("requeue_stale_jobs");
-  const { data: jobs, error } = await db.rpc("claim_jobs", { p_limit: limit });
+  const { data: jobs, error } = kinds?.length
+    ? await db.rpc("claim_jobs_of", { p_kinds: kinds, p_limit: limit })
+    : await db.rpc("claim_jobs", { p_limit: limit });
   if (error) throw new Error(`claim_jobs: ${error.message}`);
   let failed = 0;
   for (const job of jobs ?? []) {

@@ -1,36 +1,14 @@
-import Link from "next/link";
 import { Suspense } from "react";
-
-const TABS = [
-  ["", "Details"],
-  ["/uploads", "Uploads"],
-  ["/credits", "Credits"],
-  ["/pricing", "Pricing"],
-  ["/publish", "Publish"],
-] as const;
+import { FilmTabs } from "./film-tabs";
 
 /** Tabs for one film. Each tab page loads the film itself (and checks ownership). */
-export default function FilmLayout({ children, params }: LayoutProps<"/studio/films/[id]">) {
+export default function FilmLayout({ children }: LayoutProps<"/studio/films/[id]">) {
   return (
     <div className="grid gap-6">
       <Suspense fallback={<div className="h-9 border-b border-line" />}>
-        <Tabs params={params} />
+        <FilmTabs />
       </Suspense>
       {children}
     </div>
-  );
-}
-
-/** Reads the film id (runtime data), so it streams inside Suspense. */
-async function Tabs({ params }: Pick<LayoutProps<"/studio/films/[id]">, "params">) {
-  const { id } = await params;
-  return (
-    <nav className="flex flex-wrap gap-2 border-b border-line pb-3 text-sm" aria-label="Film sections">
-      {TABS.map(([path, label]) => (
-        <Link key={label} href={`/studio/films/${id}${path}`} className="rounded-full border border-line px-3 py-1 hover:border-fg/40">
-          {label}
-        </Link>
-      ))}
-    </nav>
   );
 }
