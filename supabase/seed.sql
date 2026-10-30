@@ -10,9 +10,12 @@ with u(id, email, name) as (values
   ('a0000000-0000-0000-0000-000000000003'::uuid, 'leilani@umoobi.test', 'Leilani Kahale'),
   ('a0000000-0000-0000-0000-000000000004'::uuid, 'staff@umoobi.test', 'Umoobi Staff'),
   ('a0000000-0000-0000-0000-000000000005'::uuid, 'rosa@umoobi.test', 'Rosa Diaz'))
-insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+-- GoTrue can't read NULL token columns, so they're set to ''.
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change, email_change_token_current, phone_change, phone_change_token, reauthentication_token)
 select '00000000-0000-0000-0000-000000000000', id, 'authenticated', 'authenticated', email, now(),
-       '{"provider":"email","providers":["email"]}', jsonb_build_object('display_name', name, 'birth_year', 1990), now(), now()
+       '{"provider":"email","providers":["email"]}', jsonb_build_object('display_name', name, 'birth_year', 1990), now(), now(),
+       '', '', '', '', '', '', '', ''
 from u;
 
 insert into auth.identities (id, user_id, provider_id, provider, identity_data, created_at, updated_at, last_sign_in_at)
