@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { admin } from "./db";
+import { admin, signInAs } from "./db";
+import { uniqueEmail } from "./helpers";
 import { signInExisting } from "./existing-user";
 
 const SALT = "c0000000-0000-0000-0000-000000000001";
@@ -63,8 +64,8 @@ test("a renter can watch, review and follow the filmmaker", async ({ page }) => 
   await admin.from("follows").delete().eq("follower_id", jordan.id).eq("account_id", "b0000000-0000-0000-0000-000000000001");
 });
 
-test("reporting undisclosed AI hides the film and queues a staff review (D46)", async ({ page }, info) => {
-  const slug = `report-me-${info.project.name}-${Date.now()}`;
+async function reportableFilm(project: string) {
+  const slug = `report-me-${project}-${Date.now()}`;
   const { data: film } = await admin
     .from("films")
     .insert({
@@ -81,26 +82,57 @@ test("reporting undisclosed AI hides the film and queues a staff review (D46)", 
     .select("id")
     .single()
     .throwOnError();
-  try {
-    await page.goto(`/f/${slug}`);
-    await page.getByText("Report this film").click();
-    await page.getByLabel("Uses AI-generated imagery without a label").check();
-    await page.getByRole("button", { name: "Send report" }).click();
-    await expect(page.getByText("Umoobi staff will look at this within 24 hours.")).toBeVisible();
+  return { slug, id: film!.id };
+}
 
-    const { data: after } = await admin.from("films").select("status").eq("id", film!.id).single();
-    expect(after!.status).toBe("hidden");
-    const { data: items } = await admin.from("review_items").select("kind, status").eq("film_id", film!.id);
+async function cleanupFilm(id: string) {
+  await admin.from("content_reports").delete().eq("film_id", id);
+  await admin.from("review_items").delete().eq("film_id", id);
+  await admin.from("entitlements").delete().eq("film_id", id);
+}
+
+async function sendAiReport(page: import("@playwright/test").Page, slug: string) {
+  await page.goto(`/f/${slug}`);
+  await page.getByText("Report this film").click();
+  await page.getByLabel("Uses AI-generated imagery without a label").check();
+  await page.getByRole("button", { name: "Send report" }).click();
+  await expect(page.getByText("Umoobi staff will look at this within 24 hours.")).toBeVisible();
+}
+
+test("a stranger's undisclosed-AI report queues a staff review but doesn't hide the film (D66)", async ({ page }, info) => {
+  const film = await reportableFilm(info.project.name);
+  try {
+    await sendAiReport(page, film.slug);
+    const { data: after } = await admin.from("films").select("status").eq("id", film.id).single();
+    expect(after!.status).toBe("published");
+    const { data: items } = await admin.from("review_items").select("kind, status").eq("film_id", film.id);
     expect(items).toEqual([{ kind: "report", status: "open" }]);
-    await page.goto(`/f/${slug}`);
-    await expect(page.getByText("This page could not be found.")).toBeVisible();
   } finally {
-    await admin.from("content_reports").delete().eq("film_id", film!.id);
-    await admin.from("review_items").delete().eq("film_id", film!.id);
-    await admin.from("films").delete().eq("id", film!.id);
+    await cleanupFilm(film.id);
+    await admin.from("films").delete().eq("id", film.id);
   }
 });
 
+test("a buyer's undisclosed-AI report hides the film at once and queues a staff review (D46)", async ({ page }, info) => {
+  const film = await reportableFilm(info.project.name);
+  const buyer = await signInAs(page, uniqueEmail("reporter"));
+  const { data: offer } = await admin.from("offers").insert({ film_id: film.id, kind: "rent", price_cents: 199, rental_hours: 48 }).select("id").single().throwOnError();
+  const { data: order } = await admin
+    .from("orders")
+    .insert({ viewer_id: buyer.id, offer_id: offer!.id, film_id: film.id, account_id: ROSA_ACCOUNT, kind: "rent", subtotal_cents: 199 })
+    .select("id")
+    .single()
+    .throwOnError();
+  await admin.rpc("record_sale", { p_order: order!.id, p_tax_cents: 0, p_processing_cents: 36, p_payment_intent: `pi_e2e_${order!.id}`, p_charge: "" });
+  await sendAiReport(page, film.slug);
+  const { data: after } = await admin.from("films").select("status").eq("id", film.id).single();
+  expect(after!.status).toBe("hidden");
+  const { data: items } = await admin.from("review_items").select("kind, status").eq("film_id", film.id);
+  expect(items).toEqual([{ kind: "report", status: "open" }]);
+  await page.goto(`/f/${film.slug}`);
+  await expect(page.getByText("This page could not be found.")).toBeVisible();
+  // Orders and ledger lines are append-only records, so this film stays (hidden) in the test DB.
+});
 test("person and filmmaker pages list their films", async ({ page }) => {
   await page.goto("/p/leilani-kahale");
   await expect(page.getByRole("heading", { name: "Leilani Kahale" })).toBeVisible();

@@ -6,7 +6,8 @@ const REASONS = new Set(["undisclosed_ai", "explicit", "copyright", "other"]);
 
 /**
  * Viewer report. Anyone can report; a signed-in reporter is recorded for follow-up. A report
- * of undisclosed AI hides the film from sale at once until staff confirm within 24 hours (D46).
+ * of undisclosed AI from a viewer who paid for the film hides it from sale at once until staff
+ * confirm within 24 hours (D46, D66).
  */
 export async function POST(request: NextRequest, ctx: RouteContext<"/api/films/[id]/reports">) {
   const { id } = await ctx.params;
@@ -27,7 +28,19 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/films/[
     details,
   });
 
-  const hide = reason === "undisclosed_ai" && !film.ai_generated;
+  // Only a signed-in viewer who rented or bought the film can hide it instantly (D66); anyone
+  // else's report still reaches the staff queue, so a stranger can't take a film off sale.
+  let watched = false;
+  if (auth.user) {
+    const { count } = await db
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("viewer_id", auth.user.id)
+      .eq("film_id", id)
+      .eq("status", "paid");
+    watched = (count ?? 0) > 0;
+  }
+  const hide = reason === "undisclosed_ai" && !film.ai_generated && watched;
   if (hide) await db.from("films").update({ status: "hidden" }).eq("id", id).eq("status", "published");
 
   // One open review item per film and reason, so a pile-on doesn't flood the queue.
