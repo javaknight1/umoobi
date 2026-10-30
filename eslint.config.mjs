@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Agent worktrees
     ".claude/**",
+    // Playwright output (traces contain copied sources).
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

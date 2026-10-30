@@ -2,6 +2,7 @@ import type { Handler } from "../index";
 import { checkFilm } from "@/lib/checks/film";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { monthlyPayouts, reconcile, refundOrder, rollupAnalytics, takedownRestore } from "./money";
+import { sendReceipt } from "./send-receipt";
 
 /**
  * Job kind → handler. Each feature registers its handlers here.
@@ -17,4 +18,5 @@ export const handlers: Record<string, Handler> = {
   monthly_payouts: monthlyPayouts,
   refund_order: refundOrder,
   takedown_restore: takedownRestore,
+  send_receipt: sendReceipt,
 };

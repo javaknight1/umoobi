@@ -39,7 +39,13 @@ export async function checkoutPaid(c: PaidCheckout) {
     p_charge: c.chargeId ?? "",
   });
   if (error) throw new Error(`record_sale failed: ${error.message}`);
-  await db.from("jobs").insert({ kind: "send_receipt", payload: { order_id: c.orderId } });
+  // Funnel count only: a fresh anonymous session id, so the purchase can't be joined back
+  // to the buyer's browsing (D38).
+  const { data: order } = await db.from("orders").select("film_id").eq("id", c.orderId).single();
+  await Promise.all([
+    order ? db.from("page_events").insert({ session_id: crypto.randomUUID(), film_id: order.film_id, event: "purchase" }) : null,
+    db.from("jobs").insert({ kind: "send_receipt", payload: { order_id: c.orderId } }),
+  ]);
 }
 
 export async function checkoutExpired(orderId: string) {
