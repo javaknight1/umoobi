@@ -230,6 +230,7 @@ export type Database = {
         Row: {
           created_at: string
           duration_seconds: number | null
+          error_message: string | null
           film_id: string
           id: string
           kind: string
@@ -244,6 +245,7 @@ export type Database = {
         Insert: {
           created_at?: string
           duration_seconds?: number | null
+          error_message?: string | null
           film_id: string
           id?: string
           kind: string
@@ -258,6 +260,7 @@ export type Database = {
         Update: {
           created_at?: string
           duration_seconds?: number | null
+          error_message?: string | null
           film_id?: string
           id?: string
           kind?: string
@@ -1405,6 +1408,13 @@ export type Database = {
         Args: { a: string; on_date?: string }
         Returns: number
       }
+      because_you_watched: {
+        Args: { p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
+      }
       can_manage_film: { Args: { f: string }; Returns: boolean }
       can_review: { Args: { f: string }; Returns: boolean }
       cap_for: { Args: { kind: string; tier: string }; Returns: number }
@@ -1427,6 +1437,26 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      claim_jobs_of: {
+        Args: { p_kinds: string[]; p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          id: number
+          kind: string
+          last_error: string | null
+          payload: Json
+          run_after: string
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_person: { Args: { p_token: string }; Returns: string }
       credit_shares_ok: { Args: { f: string }; Returns: boolean }
       estimated_processing_cents: { Args: { total: number }; Returns: number }
       fee_cents: {
@@ -1436,6 +1466,13 @@ export type Database = {
       film_is_public: { Args: { f: string }; Returns: boolean }
       film_is_purchasable: { Args: { f: string }; Returns: boolean }
       film_kind: { Args: { runtime_seconds: number }; Returns: string }
+      film_rating: {
+        Args: { p_film: string }
+        Returns: {
+          average: number
+          count: number
+        }[]
+      }
       films_used: {
         Args: { a: string; kind: string; yr: number }
         Returns: number
@@ -1472,6 +1509,47 @@ export type Database = {
         Returns: undefined
       }
       requeue_stale_jobs: { Args: never; Returns: number }
+      save_credits: {
+        Args: { p_credits: Json; p_film: string }
+        Returns: undefined
+      }
+      search_films: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          film_id: string
+          rank: number
+        }[]
+      }
+      search_people: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          person_id: string
+          rank: number
+        }[]
+      }
+      set_film_offers: {
+        Args: {
+          f: string
+          p_buy_cents: number
+          p_rent_cents: number
+          p_rent_hours: number
+        }
+        Returns: {
+          active: boolean
+          created_at: string
+          film_id: string
+          id: string
+          kind: string
+          price_cents: number
+          rental_hours: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "offers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       start_playback: {
         Args: { f: string }
         Returns: {
@@ -1493,6 +1571,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      trending_films: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
+      }
+      upgrade_tiers: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
