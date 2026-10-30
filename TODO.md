@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-10-30
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
-**Current Task:** T001 — Foundations
+**Current Task:** T004 — Filmmaker onboarding and vetting (T001/T002 code done; deploy blocked)
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
 **Next Milestone:** Waitlist live by 2026-11-13 (before Vimeo On Demand storefronts go offline 2026-11-20); Gate 1 on 2027-07-30
 
@@ -93,13 +93,14 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 **Verification:** Playwright: sign up → confirmation email in Mailpit/console → confirm link → staff count increments.
 **README update:** Waitlist and email env vars.
 
-- [ ] Design tokens (light filmmaker side, dark viewer side)
-- [ ] Landing page with fee math and cost comparison
-- [ ] Waitlist form (email, role, film title, feature/short, where they sell, trailer link, unticked launch-emails box)
-- [ ] Double opt-in email and confirm route
-- [ ] Vimeo On Demand migration guide
-- [ ] Founding offer block behind `FOUNDING_OFFER` flag (D35 Proposed)
-- [ ] Staff view + CSV export
+- [x] Design tokens (light filmmaker side, dark viewer side)
+- [x] Landing page with fee math and cost comparison
+- [x] Waitlist form (email, role, film title, feature/short, where they sell, trailer link, unticked launch-emails box)
+- [x] Double opt-in email and confirm route
+- [x] Vimeo On Demand migration guide
+- [x] Founding offer block behind `FOUNDING_OFFER` flag (D35 Proposed)
+- [x] Staff view + CSV export (staff need TOTP 2FA: `/settings/security`)
+- [x] Playwright e2e: waitlist + confirm, magic-link sign-up, COPPA block (12 passing, phone + desktop)
 - [ ] Production deploy and domain (blocked on T024 + Vercel)
 
 ## T003 — Spike S1: Stripe platform approval
