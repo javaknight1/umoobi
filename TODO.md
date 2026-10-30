@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-10-30
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
-**Current Task:** Verify full e2e on a quiet machine (12/94 failed under load avg 45 on 2026-10-30; each passed in isolation), then T020 hardening
+**Current Task:** UI reskin to the 17 mockups (in progress), then T020 hardening
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
 **Next Milestone:** Waitlist live by 2026-11-13 (before Vimeo On Demand storefronts go offline 2026-11-20); Gate 1 on 2027-07-30
 
@@ -439,15 +439,18 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 
 ## Status 2026-10-30
 
-Code built and merged for T001, T002, T004, T006, T009, T010, T011, T013, T014, T015, T016, T017, T018, T019, T021 (local half). Unit 60 pass, DB 124 pass, e2e 79/94 pass under heavy load. Proposed decisions D53–D64 are in fork reports; still to be added to Notion Decisions.
+- Done: T010, T014, T015, T016, T017, T018, T019, T024 (umoobi.sharkfins.xyz, D65), T030 (mockups added by Rob).
+- Built, blocked on vendor accounts: T001/T002 (Supabase + Vercel for deploy), T004 + T011 + T021 (Stripe), T006 + T013 (Mux), T009 (Sightengine, TMDB terms).
+- Repo: https://github.com/javaknight1/umoobi (public). CI: lint, type-check, unit (60), pgTAP (124), Playwright (93).
+- Security fixes in T020 so far: money functions locked to the service role; only paying viewers' AI reports hide a film (D66); staff e2e runs real TOTP.
+- Decisions D48–D66 are in the Notion Decisions page.
 
 ## Blocked — needs Rob
 
 | Task | Needed | How to unblock | Stubbed meanwhile |
 |---|---|---|---|
-| T001, T002 | GitHub remote | Allow `gh repo create javaknight1/umoobi --private` (it was denied this run), or create it and `git push -u origin main` | Commits are local |
-| T001, T002 | Cloud Supabase + Vercel project | Approve a Supabase project (free slots are used) and a Vercel project | Local Supabase |
-| T002 | Domain | T024 | `NEXT_PUBLIC_SITE_URL` |
+| T001, T002 | Cloud Supabase project | Both free slots are used: approve Supabase Pro (~$25/mo) or pause a project to free a slot | Local Supabase |
+| T001, T002 | Vercel login | Run `! vercel login` (stored token expired), then follow docs/DEPLOY.md | — |
 | T003, T004, T011 | Stripe account for Umoobi + test keys | Create the account, save keys to Bitwarden as `Stripe (Umoobi)` | Dev payments provider |
 | T005, T006, T013 | Mux account + token + signing key | Sign up, save to Bitwarden as `Mux` | Dev video provider (public test HLS stream) |
 | T007, T009 | Sightengine account | Sign up (Starter $29/mo), save to Bitwarden | Dev scanner (always clean, deterministic) |
