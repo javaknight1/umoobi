@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { admin, signInAs } from "./db";
+import { admin, signInAs, signInStaff } from "./db";
 import { uniqueEmail } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
@@ -19,7 +19,7 @@ test("staff action a DMCA notice, then record a counter-notice", async ({ page }
     .select("id")
     .single();
 
-  await signInAs(page, uniqueEmail("staffer"), { roles: ["viewer", "staff"], next: "/staff/takedowns" });
+  await signInStaff(page, "/staff/takedowns");
   const card = page.locator("li", { hasText: title });
   await card.getByRole("button", { name: "Valid: take down and strike" }).click();
   await expect(card).toContainText("actioned");
@@ -44,7 +44,7 @@ test("staff hold and release a filmmaker's payouts", async ({ page }, info) => {
     .insert({ owner_id: owner.data.user!.id, display_name: name, slug: `hold-${Date.now()}`, status: "approved", payouts_enabled: true })
     .select("id")
     .single();
-  await signInAs(page, uniqueEmail("staffer"), { roles: ["viewer", "staff"], next: "/staff/payouts" });
+  await signInStaff(page, "/staff/payouts");
   const row = page.locator("tr", { hasText: name });
   await row.getByRole("button", { name: "Hold payouts" }).click();
   await expect(row.getByRole("button", { name: "Release hold" })).toBeVisible();

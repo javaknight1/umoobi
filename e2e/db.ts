@@ -42,3 +42,18 @@ export async function signInAs(page: Page, email: string, opts: { roles?: string
   }
   throw new Error(`Could not sign in as ${email}`);
 }
+
+/**
+ * A fresh staff user who passes real two-factor sign-in (TOTP enrolment on first visit),
+ * then lands on `next`. One user per test, so parallel runs never share a factor.
+ */
+export async function signInStaff(page: Page, next: string) {
+  const { totp } = await import("./totp");
+  const email = `staff-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@umoobi.test`;
+  const user = await signInAs(page, email, { roles: ["viewer", "staff"], next: `/settings/security?next=${encodeURIComponent(next)}` });
+  const keyText = await page.getByText(/Or enter this key:/).textContent();
+  await page.getByLabel("6-digit code").fill(totp(keyText!.replace(/.*key:\s*/, "").trim()));
+  await page.getByRole("button", { name: "Verify" }).click();
+  await page.waitForURL((u) => u.pathname === new URL(next, "http://x").pathname);
+  return user;
+}

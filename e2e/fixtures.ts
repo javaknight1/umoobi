@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
-import { admin } from "./db";
+import { admin, signInAs } from "./db";
 import { uniqueEmail } from "./helpers";
 
 const cronSecret = readFileSync(join(process.cwd(), ".env.local"), "utf8").match(/^CRON_SECRET=(.*)$/m)?.[1] ?? "";
@@ -42,20 +42,9 @@ export async function newFilmmaker(prefix = "fm") {
   return { email, userId, accountId: acct!.id };
 }
 
-/**
- * Signs in an existing (seeded) user through a one-time link. Unlike signInAs, it doesn't
- * page through every user first, so it works however many test users exist.
- */
+/** Signs in an existing (seeded) user. */
 export async function signInExisting(page: Page, email: string, next = "/") {
-  // Under heavy local load the token check can time out; a fresh link usually works.
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    const { data } = await retry(() => admin.auth.admin.generateLink({ type: "magiclink", email }));
-    const q = new URLSearchParams({ token_hash: data.properties!.hashed_token, type: "magiclink", next });
-    await page.goto(`/auth/callback?${q}`);
-    await page.waitForURL((u) => !u.pathname.startsWith("/auth/"));
-    if (!new URL(page.url()).pathname.startsWith("/sign-in")) return;
-  }
-  throw new Error(`Couldn't sign in as ${email}`);
+  await signInAs(page, email, { next });
 }
 
 /** Drains `check_film` jobs until the film leaves draft/checking. */

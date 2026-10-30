@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { admin } from "./db";
+import { admin, signInStaff } from "./db";
 import { newFilmmaker, signInExisting } from "./fixtures";
 
 test.describe.configure({ timeout: 120_000 });
 const slow = expect.configure({ timeout: 45_000 });
 
-// The e2e dev server runs with STAFF_REQUIRE_2FA=false (playwright.config.ts); production requires TOTP.
 
 async function filmInReview(accountId: string, title: string, status: "review" | "hidden", kind: "film" | "ai_flag") {
   const { data: film } = await admin
@@ -40,7 +39,7 @@ test("staff approve a film the checks weren't sure about", async ({ page }) => {
   const fm = await newFilmmaker("rv");
   const title = `Review Me ${Date.now()}`;
   const filmId = await filmInReview(fm.accountId, title, "review", "film");
-  await signInExisting(page, "staff@umoobi.test", "/staff");
+  await signInStaff(page, "/staff");
   await item(page, title).getByRole("button", { name: "Approve" }).click();
   await slow(item(page, title)).toHaveCount(0);
   const { data } = await admin.from("films").select("status, staff_approved").eq("id", filmId).single();
@@ -53,7 +52,7 @@ test("staff confirm undeclared AI on a hidden film: removed with a strike", asyn
   const fm = await newFilmmaker("ai");
   const title = `Hidden AI ${Date.now()}`;
   const filmId = await filmInReview(fm.accountId, title, "hidden", "ai_flag");
-  await signInExisting(page, "staff@umoobi.test", "/staff");
+  await signInStaff(page, "/staff");
   await item(page, title).getByRole("button", { name: "Confirm undeclared AI" }).click();
   await slow(item(page, title)).toHaveCount(0);
   const { data } = await admin.from("films").select("status").eq("id", filmId).single();
@@ -66,7 +65,7 @@ test("staff clear a misfired AI flag and the film goes back on sale", async ({ p
   const fm = await newFilmmaker("clear");
   const title = `False Alarm ${Date.now()}`;
   const filmId = await filmInReview(fm.accountId, title, "hidden", "ai_flag");
-  await signInExisting(page, "staff@umoobi.test", "/staff");
+  await signInStaff(page, "/staff");
   await item(page, title).getByRole("button", { name: "Clear flag (not AI)" }).click();
   await slow(item(page, title)).toHaveCount(0);
   const { data } = await admin.from("films").select("status, ai_flagged").eq("id", filmId).single();
@@ -79,7 +78,7 @@ test("staff approve a filmmaker application from the queue", async ({ page }) =>
   await admin.from("profiles").update({ roles: ["viewer"] }).eq("id", fm.userId);
   await admin.from("filmmaker_accounts").update({ display_name: `Pending ${fm.accountId.slice(0, 8)}` }).eq("id", fm.accountId);
   await admin.from("review_items").insert({ kind: "account", account_id: fm.accountId, score: 72, reason: "No past work" });
-  await signInExisting(page, "staff@umoobi.test", "/staff");
+  await signInStaff(page, "/staff");
   const row = item(page, `Pending ${fm.accountId.slice(0, 8)}`);
   await row.getByRole("button", { name: "Approve" }).click();
   await slow(row).toHaveCount(0);
@@ -93,7 +92,7 @@ test("staff retry a failed job", async ({ page }) => {
     .insert({ kind: "e2e_noop", status: "failed", attempts: 5, last_error: "boom", run_after: new Date(Date.now() + 86_400_000).toISOString() })
     .select("id")
     .single();
-  await signInExisting(page, "staff@umoobi.test", "/staff/jobs");
+  await signInStaff(page, "/staff/jobs");
   const row = page.locator("li").filter({ hasText: `#${job!.id} e2e_noop` });
   await row.getByRole("button", { name: "Retry" }).click();
   await slow(row).toHaveCount(0);
