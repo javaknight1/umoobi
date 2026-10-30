@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,7 +17,12 @@ export function TwoFactor({ next }: { next: string }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
+  // Strict Mode runs effects twice in dev; enrolling twice would show a stale QR code.
+  const started = useRef(false);
+
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     const supabase = createClient();
     (async () => {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
