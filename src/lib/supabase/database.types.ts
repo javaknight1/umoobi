@@ -1405,6 +1405,13 @@ export type Database = {
         Args: { a: string; on_date?: string }
         Returns: number
       }
+      because_you_watched: {
+        Args: { p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
+      }
       can_manage_film: { Args: { f: string }; Returns: boolean }
       can_review: { Args: { f: string }; Returns: boolean }
       cap_for: { Args: { kind: string; tier: string }; Returns: number }
@@ -1427,6 +1434,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      claim_person: { Args: { p_token: string }; Returns: string }
       credit_shares_ok: { Args: { f: string }; Returns: boolean }
       estimated_processing_cents: { Args: { total: number }; Returns: number }
       fee_cents: {
@@ -1436,6 +1444,13 @@ export type Database = {
       film_is_public: { Args: { f: string }; Returns: boolean }
       film_is_purchasable: { Args: { f: string }; Returns: boolean }
       film_kind: { Args: { runtime_seconds: number }; Returns: string }
+      film_rating: {
+        Args: { p_film: string }
+        Returns: {
+          average: number
+          count: number
+        }[]
+      }
       films_used: {
         Args: { a: string; kind: string; yr: number }
         Returns: number
@@ -1472,6 +1487,24 @@ export type Database = {
         Returns: undefined
       }
       requeue_stale_jobs: { Args: never; Returns: number }
+      save_credits: {
+        Args: { p_credits: Json; p_film: string }
+        Returns: undefined
+      }
+      search_films: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          film_id: string
+          rank: number
+        }[]
+      }
+      search_people: {
+        Args: { p_limit?: number; q: string }
+        Returns: {
+          person_id: string
+          rank: number
+        }[]
+      }
       start_playback: {
         Args: { f: string }
         Returns: {
@@ -1492,6 +1525,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      trending_films: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: {
+          film_id: string
+          score: number
+        }[]
       }
     }
     Enums: {
