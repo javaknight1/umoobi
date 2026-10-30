@@ -8,6 +8,8 @@ const baseURL = `http://localhost:${port}`;
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
+  workers: process.env.CI ? 2 : 4,
+  expect: { timeout: 15_000 },
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
     { name: "phone", use: { ...devices["Pixel 7"] } },
