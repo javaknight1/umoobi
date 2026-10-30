@@ -15,5 +15,12 @@ export default defineConfig({
     { name: "phone", use: { ...devices["Pixel 7"] } },
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
-  webServer: { command: `pnpm exec next dev -p ${port}`, url: baseURL, reuseExistingServer: true, timeout: 120_000 },
+  webServer: {
+    command: `pnpm exec next dev -p ${port}`,
+    url: baseURL,
+    reuseExistingServer: true,
+    timeout: 120_000,
+    // Staff tools need TOTP in every real environment; e2e can't type authenticator codes.
+    env: { STAFF_REQUIRE_2FA: "false" },
+  },
 });
