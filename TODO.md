@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-10-30
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
-**Current Task:** T006 — Upload and encoding
+**Current Task:** Verify full e2e on a quiet machine (12/94 failed under load avg 45 on 2026-10-30; each passed in isolation), then T020 hardening
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
 **Next Milestone:** Waitlist live by 2026-11-13 (before Vimeo On Demand storefronts go offline 2026-11-20); Gate 1 on 2027-07-30
 
@@ -436,6 +436,10 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 **Sprint**: S2 · **Priority**: P1 · **Type**: Launch · **Ref**: Metric. - [ ] Tracks after T002 is live
 
 ---
+
+## Status 2026-10-30
+
+Code built and merged for T001, T002, T004, T006, T009, T010, T011, T013, T014, T015, T016, T017, T018, T019, T021 (local half). Unit 60 pass, DB 124 pass, e2e 79/94 pass under heavy load. Proposed decisions D53–D64 are in fork reports; still to be added to Notion Decisions.
 
 ## Blocked — needs Rob
 
