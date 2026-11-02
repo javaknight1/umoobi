@@ -1,12 +1,23 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { Avatar, Poster } from "@/components/brand";
+import { MarketingShell } from "@/components/marketing/site-header";
 import { WaitlistForm } from "@/components/marketing/waitlist-form";
 import { formatCents, previewSale } from "@/lib/money";
 
-const rental = previewSale(499);
 const purchase = previewSale(1299);
+const rental = previewSale(499);
 const foundingOffer = process.env.FOUNDING_OFFER === "true"; // D35, shown only once confirmed
+
+/** Illustrative posters for the hero (sample titles, not live films). */
+const HERO_POSTERS = [
+  ["Salt & Static", "Maya Okafor", "mt-6"],
+  ["Kiln", "Theo Vance", "mt-14"],
+  ["Paper Moons", "Jun Park", ""],
+  ["Dust Bowl Choir", "Ellen Marsh", "mt-6"],
+  ["Harvest Moon Motel", "Carlos Mendez", "mt-14"],
+  ["The Last Ferry to Ocracoke", "", ""],
+] as const;
 
 const COMPARISON = [
   ["Storefront", "TribuShare Audience plan, $199/yr", "Included"],
@@ -18,224 +29,203 @@ const COMPARISON = [
 ] as const;
 
 const STEPS = [
-  ["Get verified", "Three steps: about you, an automatic ID and past-work check, and your payout account. Most filmmakers are approved the same day."],
-  ["Upload and price", "Upload your master. Choose rent, buy or both, at prices from $0.99. Free trailers and clips bring viewers in."],
-  ["Share one link", "Your film page is the link you post. Viewers rent in two taps and watch on the web or cast to their TV."],
-  ["Get paid monthly", "Every sale line by line: price, Umoobi fee, card fee, what you earned. Payouts arrive monthly."],
+  ["Apply in minutes", "Verify your ID and link your past work. Most filmmakers are approved automatically, the same day."],
+  ["Upload and set your price", "Rent, buy or both. You pick the price and the rental window. Every film is checked for rights automatically."],
+  ["Share one link", "Post your film's page anywhere. Fans rent in two taps, and you get paid out every month."],
 ] as const;
+
+const CREW = ["Leilani Kahale · Actor", "Sam Ortiz · Cinematographer", "Priya Natarajan · Editor", "Eli Brandt · Composer"];
 
 export default function Home() {
   return (
-    <>
-      <SiteHeader />
-      <div className="bg-fg px-4 py-2 text-center text-sm text-bg">
-        Vimeo On Demand takes storefronts offline on <strong>November 20, 2026</strong>.{" "}
-        <Link href="/guides/leaving-vimeo-on-demand" className="underline underline-offset-2">
+    <MarketingShell>
+      <div className="border-b border-line bg-surface px-4 py-2 text-center text-sm text-muted">
+        Vimeo On Demand takes storefronts offline on <strong className="text-fg">November 20, 2026</strong>.{" "}
+        <Link href="/guides/leaving-vimeo-on-demand" className="text-accent underline-offset-2 hover:underline">
           What to download before then →
         </Link>
       </div>
 
-      <main className="flex-1">
+      <main className="mx-auto w-full max-w-[90rem] flex-1 px-4 sm:px-8">
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.2fr_1fr] md:py-24">
-          <div className="flex flex-col justify-center gap-6">
-            <p className="text-sm font-medium uppercase tracking-widest text-accent">For independent filmmakers</p>
-            <h1 className="font-display text-5xl leading-[1.05] md:text-7xl">
-              Sell your film from one link, at your price.
+        <section className="grid items-center gap-12 py-14 lg:grid-cols-[1.15fr_1fr] lg:py-20">
+          <div className="grid content-center gap-7">
+            <h1 className="font-display text-5xl leading-[0.98] sm:text-7xl lg:text-[5.4rem]">
+              Your film is finished. Now let people watch it.
             </h1>
-            <p className="max-w-xl text-lg text-muted">
-              Umoobi lets any verified independent filmmaker in the US rent or sell their film directly to their own
-              audience. One page replaces the storefront, the website and the link page, and every sale brings a new
-              viewer onto a platform built to help them find your next film.
+            <p className="max-w-xl text-lg text-muted sm:text-xl">
+              Umoobi is where independent filmmakers rent and sell their films directly to their audience, at the
+              price they choose.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="#waitlist" className="btn-primary">
+              <Link href="#waitlist" className="btn-primary px-7 py-3.5 text-base">
                 Join the waitlist
               </Link>
-              <Link href="#fees" className="btn-ghost">
-                See the fee math
+              <Link href="/discover" className="btn-ghost px-7 py-3.5 text-base">
+                Browse films
               </Link>
             </div>
-          </div>
-
-          {/* Mini film page preview (sample data) */}
-          <div className="theater overflow-hidden rounded-3xl border border-line shadow-2xl">
-            <div className="aspect-video bg-[radial-gradient(circle_at_30%_30%,#3b2f22,#0f0e0c_70%)] p-5">
-              <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-fg">▶ Trailer · 2:10</span>
-            </div>
-            <div className="grid gap-3 p-5">
-              <p className="text-xs uppercase tracking-widest text-muted">Low Tide Pictures · 2026 · 94 min</p>
-              <p className="font-display text-3xl">Salt &amp; Static</p>
-              <p className="text-sm text-muted">
-                A radio operator on a dying island station picks up a signal that shouldn&apos;t exist.
-              </p>
-              <div className="flex gap-2">
-                <span className="btn-primary px-4 py-2">Rent {formatCents(499)} · 48 h</span>
-                <span className="btn-ghost px-4 py-2">Buy {formatCents(1299)}</span>
+            <dl className="mt-2 grid max-w-xl grid-cols-2 gap-6">
+              <div>
+                <dt className="sr-only">Your share</dt>
+                <dd className="font-display text-4xl">90%</dd>
+                <dd className="text-sm text-muted">of every sale is yours, before card fees</dd>
               </div>
-              <p className="text-xs text-muted">
-                Buying gets you a license to watch, not ownership. Sample film and filmmaker.
-              </p>
-            </div>
+              <div>
+                <dt className="sr-only">Lowest price</dt>
+                <dd className="font-display text-4xl">$0.99</dd>
+                <dd className="text-sm text-muted">is the lowest price, so every sale pays you</dd>
+              </div>
+            </dl>
           </div>
+          <figure aria-label="Sample film posters" className="grid grid-cols-3 gap-4 sm:gap-5">
+            {HERO_POSTERS.map(([title, by, offset]) => (
+              <div key={title} className={offset}>
+                <Poster title={title} url={null} slug={title} by={by || null} className="shadow-2xl" />
+              </div>
+            ))}
+            <figcaption className="col-span-3 text-right text-xs text-muted">Sample films</figcaption>
+          </figure>
         </section>
 
         {/* How it works */}
-        <section className="border-y border-line bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-16">
-            <h2 className="font-display text-4xl">How it works</h2>
-            <ol className="mt-8 grid gap-6 md:grid-cols-4">
-              {STEPS.map(([title, body], i) => (
-                <li key={title} className="grid content-start gap-2">
-                  <span className="font-display text-3xl text-accent">{i + 1}</span>
-                  <p className="font-medium">{title}</p>
-                  <p className="text-sm text-muted">{body}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
+        <section className="grid gap-6 py-10">
+          <h2 className="font-display text-4xl sm:text-5xl">How it works for filmmakers</h2>
+          <ol className="grid gap-5 md:grid-cols-3">
+            {STEPS.map(([title, body], i) => (
+              <li key={title} className="card grid content-start gap-2 p-8">
+                <span className="font-display text-5xl text-accent">{i + 1}</span>
+                <p className="font-display text-2xl">{title}</p>
+                <p className="text-muted">{body}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
-        {/* Fee math */}
-        <section id="fees" className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2">
-          <div className="grid content-start gap-4">
-            <h2 className="font-display text-4xl">One fee, shown on every line.</h2>
-            <p className="text-muted">
-              Umoobi takes 10% of each sale (at least 25¢), and the card processor takes its fee. That&apos;s it: no
-              monthly plan, no setup fee, nothing when your film isn&apos;t selling. Buyers pay your price plus sales
-              tax, which Umoobi collects and pays to each state.
+        {/* Every cent + crew pages */}
+        <section id="fees" className="grid gap-5 py-10 lg:grid-cols-2">
+          <div className="rounded-3xl bg-accent p-8 text-accent-fg sm:p-10">
+            <h2 className="font-display text-4xl">You see every cent</h2>
+            <p className="mt-1 text-lg">A {formatCents(purchase.priceCents)} purchase, as it shows up in your money page:</p>
+            <dl className="mt-6 grid text-lg">
+              <Line k="Buyer pays" v={`${formatCents(purchase.priceCents)} + sales tax`} />
+              <Line k="Umoobi fee (10%)" v={`−${formatCents(purchase.feeCents)}`} />
+              <Line k="Card processing" v={`−${formatCents(purchase.processingCents)}`} />
+              <Line k="You get" v={formatCents(purchase.netCents)} strong />
+            </dl>
+            <p className="mt-4 text-sm opacity-80">
+              A {formatCents(rental.priceCents)} rental earns you {formatCents(rental.netCents)}. The fee is 10% with a 25¢
+              minimum; the card fee is an estimate (2.9% + 30¢).
             </p>
             {foundingOffer ? (
-              <p className="card border-marquee/60 text-sm">
-                <strong>Founding filmmakers:</strong> join the waitlist before January 31, 2027 and pay 5% instead of
-                10% for your first 12 months.
+              <p className="mt-4 rounded-2xl bg-white/40 p-4 text-sm">
+                <strong>Founding filmmakers:</strong> join the waitlist before January 31, 2027 and pay 5% instead of 10%
+                for your first 12 months.
               </p>
             ) : null}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              ["A $4.99 rental", rental],
-              ["A $12.99 purchase", purchase],
-            ].map(([label, s]) => {
-              const sale = s as typeof rental;
-              return (
-                <div key={label as string} className="card grid gap-2 font-mono text-sm">
-                  <p className="font-sans font-medium">{label as string}</p>
-                  <Row k="Your price" v={formatCents(sale.priceCents)} />
-                  <Row k="Umoobi fee (10%)" v={`−${formatCents(sale.feeCents)}`} />
-                  <Row k="Card processing" v={`−${formatCents(sale.processingCents)}`} />
-                  <div className="border-t border-line pt-2">
-                    <Row k="You earn" v={formatCents(sale.netCents)} strong />
-                  </div>
-                  <p className="font-sans text-xs text-muted">Card fee is an estimate (2.9% + 30¢).</p>
-                </div>
-              );
-            })}
+          <div className="card grid content-start gap-5 p-8 sm:p-10">
+            <h2 className="font-display text-4xl">Your cast and crew get pages too</h2>
+            <p className="text-lg text-muted">
+              Every credit becomes a public page that actors and crew can claim. Viewers follow the people they like and
+              hear when their next film drops.
+            </p>
+            <ul className="flex flex-wrap gap-3">
+              {CREW.map((c) => (
+                <li key={c} className="flex items-center gap-2 rounded-full bg-surface-2 py-1.5 pl-1.5 pr-4 text-sm font-semibold">
+                  <Avatar name={c.split(" · ")[0]} size={28} />
+                  {c}
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted">Sample names.</p>
           </div>
         </section>
 
         {/* Cost comparison */}
-        <section className="border-y border-line bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-16">
-            <h2 className="font-display text-4xl">About $764 a year instead of $1,470.</h2>
-            <p className="mt-3 max-w-2xl text-muted">
-              For a film selling about $4,300 a year (600 rentals at $4.99 and 100 purchases at $12.99), compared with
-              the stack you&apos;d assemble now that Vimeo On Demand is closing. Estimates; your email tool stays the
-              same either way.
-            </p>
-            <div className="mt-8 overflow-x-auto">
-              <table className="w-full min-w-[560px] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-line text-muted">
-                    <th className="py-2 pr-4 font-medium">What you pay for</th>
-                    <th className="py-2 pr-4 font-medium">Today&apos;s stack</th>
-                    <th className="py-2 font-medium">With Umoobi</th>
+        <section className="card my-10 p-8 sm:p-10">
+          <h2 className="font-display text-4xl">About $764 a year instead of $1,470.</h2>
+          <p className="mt-3 max-w-3xl text-muted">
+            For a film selling about $4,300 a year (600 rentals at $4.99 and 100 purchases at $12.99), compared with the
+            stack you&apos;d assemble now that Vimeo On Demand is closing. Estimates; your email tool stays the same either
+            way.
+          </p>
+          <div className="mt-8 overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left">
+              <thead>
+                <tr className="border-b border-line text-sm text-muted">
+                  <th className="py-3 pr-4 font-medium">What you pay for</th>
+                  <th className="py-3 pr-4 font-medium">Today&apos;s stack</th>
+                  <th className="py-3 font-medium">With Umoobi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON.map(([what, today, umoobi]) => (
+                  <tr key={what} className="border-b border-line">
+                    <td className="py-3.5 pr-4 font-semibold">{what}</td>
+                    <td className="py-3.5 pr-4 text-muted">{today}</td>
+                    <td className="py-3.5">{umoobi}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON.map(([what, today, umoobi]) => (
-                    <tr key={what} className="border-b border-line">
-                      <td className="py-3 pr-4 font-medium">{what}</td>
-                      <td className="py-3 pr-4 text-muted">{today}</td>
-                      <td className="py-3">{umoobi}</td>
-                    </tr>
-                  ))}
-                  <tr className="font-semibold">
-                    <td className="py-3 pr-4">Total for the year</td>
-                    <td className="py-3 pr-4">about $1,470</td>
-                    <td className="py-3 text-accent">about $764</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        {/* What you get */}
-        <section className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="font-display text-4xl">More than a storefront.</h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {[
-              ["Cast and crew pages", "Everyone in your credits gets a public page they can claim. Viewers follow actors to hear about their next film. Revenue shares are recorded now; automatic split payouts come next."],
-              ["Know who watched", "Visits, trailer plays and sales; where viewers came from; top states; where viewers stop watching. Totals only, never a list of who watched, unless a buyer chooses to share."],
-              ["Discovery that sells", "Trending, new this week, genre shelves, shorts and “because you watched”. Every sale starts a viewer's library, and the next film they find might be yours."],
-              ["Watch on the TV", "Viewers stream on the web and cast to the TV with Chromecast or AirPlay. Rentals start when they press play."],
-              ["Fair rules, enforced", "Prices from $0.99. Free only for films under 5 minutes. No sexually explicit content. AI-generated imagery is allowed, but labeled."],
-              ["Pull a film any time", "Remove a film whenever you like. New sales stop and recent buyers are refunded automatically."],
-            ].map(([t, b]) => (
-              <div key={t} className="card grid content-start gap-2">
-                <p className="font-medium">{t}</p>
-                <p className="text-sm text-muted">{b}</p>
-              </div>
-            ))}
+                ))}
+                <tr className="font-display text-lg">
+                  <td className="py-4 pr-4">Total for the year</td>
+                  <td className="py-4 pr-4 text-muted">about $1,470</td>
+                  <td className="py-4 text-accent">about $764</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
         {/* Viewers */}
-        <section className="theater">
-          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-16 md:grid-cols-2">
-            <div className="grid content-start gap-4">
-              <p className="text-sm font-medium uppercase tracking-widest text-accent">For viewers</p>
-              <h2 className="font-display text-4xl">Films you won&apos;t find on the big apps.</h2>
-              <p className="text-muted">
-                Rent or buy directly from the people who made them. Your money goes to the filmmaker, not an
-                aggregator. No ads, no trackers on what you watch.
-              </p>
-            </div>
-            <ul className="grid gap-3 text-sm">
-              {["A library with rentals, purchases and your place in every film", "Cast to your TV with Chromecast or AirPlay", "Follow filmmakers and actors you love", "Reviews from people who actually watched"].map((t) => (
-                <li key={t} className="rounded-xl border border-line bg-surface px-4 py-3">
-                  {t}
-                </li>
-              ))}
-            </ul>
+        <section className="grid gap-6 py-10 md:grid-cols-2">
+          <div className="grid content-start gap-4">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent">For viewers</p>
+            <h2 className="font-display text-4xl sm:text-5xl">Films you won&apos;t find on the big apps.</h2>
+            <p className="text-lg text-muted">
+              Rent or buy directly from the people who made them. No ads, no trackers on what you watch.
+            </p>
           </div>
+          <ul className="grid gap-3">
+            {[
+              "A library with rentals, purchases and your place in every film",
+              "Cast to your TV with Chromecast or AirPlay",
+              "Follow filmmakers and actors you love",
+              "Reviews from people who actually watched",
+            ].map((t) => (
+              <li key={t} className="rounded-2xl border border-line bg-surface px-5 py-4">
+                {t}
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Waitlist */}
-        <section id="waitlist" className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2">
+        <section id="waitlist" className="grid gap-10 py-14 md:grid-cols-2">
           <div className="grid content-start gap-4">
-            <h2 className="font-display text-4xl">Join the waitlist.</h2>
-            <p className="text-muted">
+            <h2 className="font-display text-4xl sm:text-5xl">Join the waitlist.</h2>
+            <p className="text-lg text-muted">
               We&apos;re opening a closed beta for 10 filmmakers in 2027, then widening it. Tell us about your film and
               we&apos;ll be in touch. We&apos;ll only email you to confirm your address unless you tick the box.
             </p>
+            <Link href="/filmmakers/apply" className="text-sm text-accent hover:underline">
+              Already invited? Apply as a filmmaker →
+            </Link>
           </div>
           <Suspense fallback={<div className="card h-96" />}>
             <WaitlistForm />
           </Suspense>
         </section>
       </main>
-      <SiteFooter />
-    </>
+    </MarketingShell>
   );
 }
 
-function Row({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
+function Line({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
   return (
-    <p className={`flex justify-between ${strong ? "font-semibold" : ""}`}>
-      <span className="font-sans text-muted">{k}</span>
-      <span>{v}</span>
-    </p>
+    <div className={`flex justify-between gap-4 border-b border-accent-fg/15 py-3 last:border-0 ${strong ? "font-display text-2xl" : ""}`}>
+      <dt>{k}</dt>
+      <dd>{v}</dd>
+    </div>
   );
 }

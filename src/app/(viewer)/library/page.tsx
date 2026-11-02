@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Poster } from "@/components/brand";
 import { requireUser } from "@/lib/auth/session";
 import { formatPosition, rentalState } from "@/lib/library/format";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -9,8 +10,20 @@ export const metadata: Metadata = { title: "Your library", robots: { index: fals
 
 export default function LibraryPage() {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
-      <h1 className="font-display text-5xl">Your library</h1>
+    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:py-14">
+      <h1 className="font-display text-5xl sm:text-6xl">Your library</h1>
+      <nav aria-label="Library sections" className="mt-6 flex flex-wrap gap-2">
+        {[
+          ["#", "All"],
+          ["#rentals", "Rentals"],
+          ["#purchases", "Purchases"],
+          ["#history", "History"],
+        ].map(([href, label], i) => (
+          <a key={label} href={href} className={`rounded-full px-5 py-2 font-semibold ${i === 0 ? "bg-fg text-bg" : "bg-surface text-muted hover:text-fg"}`}>
+            {label}
+          </a>
+        ))}
+      </nav>
       <Suspense fallback={<div className="mt-8 h-64 rounded-2xl bg-surface" />}>
         <Library />
       </Suspense>
@@ -90,11 +103,11 @@ async function Library() {
 
 function Section({ title, empty, children }: { title: string; empty: string; children: React.ReactNode[] }) {
   return (
-    <section aria-labelledby={`lib-${title}`}>
+    <section id={title.toLowerCase()} aria-labelledby={`lib-${title}`} className="scroll-mt-24">
       <h2 id={`lib-${title}`} className="font-display text-3xl">
         {title}
       </h2>
-      {children.length ? <ul className="mt-4 grid gap-3">{children}</ul> : <p className="mt-2 text-muted">{empty}</p>}
+      {children.length ? <ul className="mt-2 grid">{children}</ul> : <p className="mt-2 text-muted">{empty}</p>}
     </section>
   );
 }
@@ -102,27 +115,22 @@ function Section({ title, empty, children }: { title: string; empty: string; chi
 function FilmRow({ film, note, watchable, resume }: { film: FilmRef; note: string; watchable: boolean; resume?: number }) {
   const pct = resume && film.runtime_seconds ? Math.min(100, Math.round((resume / film.runtime_seconds) * 100)) : 0;
   return (
-    <li className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-3">
-      <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-[radial-gradient(circle_at_30%_30%,#3b2f22,#0f0e0c_70%)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {film.poster_url ? <img src={film.poster_url} alt="" className="h-full w-full object-cover" /> : null}
-      </div>
-      <div className="grid min-w-0 flex-1 gap-1">
-        <Link href={`/f/${film.slug}`} className="truncate font-medium hover:underline">
+    <li className="flex items-center gap-5 border-b border-line py-5 last:border-0">
+      <Link href={`/f/${film.slug}`} className="w-20 shrink-0 sm:w-24" tabIndex={-1} aria-hidden>
+        <Poster title={film.title} url={film.poster_url} slug={film.slug} bare />
+      </Link>
+      <div className="grid min-w-0 flex-1 gap-1.5">
+        <Link href={`/f/${film.slug}`} className="line-clamp-2 font-display text-xl hover:underline">
           {film.title}
         </Link>
-        <p className="text-sm text-muted">
-          {note}
-          {resume ? ` · Resume at ${formatPosition(resume)}` : ""}
-        </p>
-        {pct ? (
-          <div className="h-1 w-full max-w-xs overflow-hidden rounded bg-line" aria-hidden>
-            <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
-          </div>
-        ) : null}
+        <p className="text-muted">{note}</p>
+        <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-surface-2" aria-hidden>
+          <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="text-sm text-muted">{resume ? `Resume at ${formatPosition(resume)}` : "Not started"}</p>
       </div>
       {watchable ? (
-        <Link href={`/watch/${film.slug}`} className="btn-primary px-4 py-2" aria-label={`Watch ${film.title}`}>
+        <Link href={`/watch/${film.slug}`} className="btn-primary px-5 py-2.5" aria-label={`Watch ${film.title}`}>
           {resume ? "Resume" : "Watch"}
         </Link>
       ) : null}

@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Watch", robots: { index: false } };
 
 export default function WatchPage({ params }: PageProps<"/watch/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+    <main className="mx-auto w-full max-w-[90rem] flex-1 px-4 py-6 sm:px-8 sm:py-8">
       <Suspense fallback={<div className="aspect-video w-full rounded-2xl bg-surface" />}>
         <Watch params={params} />
       </Suspense>
@@ -50,7 +50,20 @@ async function Watch({ params }: Pick<PageProps<"/watch/[slug]">, "params">) {
 
   const state = ent.kind === "rent" ? rentalState(ent, now) : null;
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl sm:text-4xl">
+            {film.title}
+            {film.ai_generated ? <span className="pill ml-3 border border-warn/60 align-middle text-warn">AI-generated</span> : null}
+          </h1>
+          <p className="text-muted">{state ? state.label : "Purchased · yours to stream"}</p>
+        </div>
+        <p className="flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm text-muted">
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-ok" />
+          Cast with Chromecast (Chrome) or AirPlay (Safari)
+        </p>
+      </div>
       <Player
         filmId={film.id}
         title={film.title}
@@ -58,17 +71,7 @@ async function Watch({ params }: Pick<PageProps<"/watch/[slug]">, "params">) {
         rentalNotStarted={ent.kind === "rent" && !ent.first_played_at}
         rentalHours={ent.rental_hours}
       />
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="font-display text-3xl">
-          {film.title}
-          {film.ai_generated ? <span className="ml-3 rounded-full border border-line px-2 py-0.5 align-middle text-xs">AI-generated</span> : null}
-        </h1>
-        <p className="text-sm text-muted">{state ? state.label : "Purchased · yours to stream"}</p>
-      </div>
-      <p className="text-sm text-muted">
-        Cast to your TV with the Chromecast button in Chrome, or AirPlay in Safari. Your phone or browser tab stays the
-        remote.
-      </p>
+      <p className="text-sm text-muted">Your phone or this browser tab stays the remote while you cast.</p>
     </div>
   );
 }

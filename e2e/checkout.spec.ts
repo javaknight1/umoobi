@@ -29,7 +29,7 @@ test("a viewer buys Salt & Static after acknowledging the license, then watches 
   await expect(page.getByRole("heading", { name: "Salt & Static" })).toBeVisible();
   await expect(page.getByText("Added at checkout")).toBeVisible();
 
-  const buy = page.getByRole("button", { name: "Buy for $12.99" });
+  const buy = page.getByRole("button", { name: "Continue to payment" });
   await expect(buy).toBeDisabled();
   const ack = page.getByRole("checkbox", { name: /buying a license to stream/ });
   await expect(ack).not.toBeChecked();
@@ -64,7 +64,7 @@ test("a viewer buys Salt & Static after acknowledging the license, then watches 
 test("a rental starts its 48-hour clock on first play, not at purchase", async ({ page }) => {
   const viewer = await signInAs(page, uniqueEmail("renter"), { next: `/checkout/${SALT_RENT}` });
   await expect(page.getByRole("checkbox")).toHaveCount(0); // rentals need no license box
-  await page.getByRole("button", { name: "Rent for $4.99" }).click();
+  await page.getByRole("button", { name: "Continue to payment" }).click();
   await page.getByRole("button", { name: "Pay" }).click();
   await expect(page.getByRole("heading", { name: "Enjoy the film." })).toBeVisible();
 
@@ -100,7 +100,7 @@ test("a free short goes straight to the library without payment", async ({ page 
 
 test("canceling checkout charges nothing", async ({ page }) => {
   await signInAs(page, uniqueEmail("canceler"), { next: `/checkout/${SALT_RENT}` });
-  await page.getByRole("button", { name: "Rent for $4.99" }).click();
+  await page.getByRole("button", { name: "Continue to payment" }).click();
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.getByText("Checkout was canceled. You haven't been charged.")).toBeVisible();
 });

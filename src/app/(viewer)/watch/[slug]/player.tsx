@@ -57,15 +57,15 @@ export function Player(props: { filmId: string; title: string; posterUrl: string
 
   if (!session) {
     return (
-      <div className="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_30%_30%,#3b2f22,#0f0e0c_70%)]">
+      <div className="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_50%_40%,#2a7f86,#0f3b40_75%)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {props.posterUrl ? <img src={props.posterUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" /> : null}
         <div className="relative grid justify-items-center gap-3 px-4 text-center">
-          <button onClick={start} disabled={loading} className="btn-primary px-8 py-4 text-base" aria-label={`Play ${props.title}`}>
+          <button onClick={start} disabled={loading} className="btn-primary px-10 py-4 text-lg" aria-label={`Play ${props.title}`}>
             {loading ? "Loading…" : "▶ Play"}
           </button>
           {props.rentalNotStarted ? (
-            <p className="text-sm text-muted">Pressing play starts your {rentalWindowLabel(props.rentalHours ?? 48)} rental.</p>
+            <p className="text-white/85">Pressing play starts your {rentalWindowLabel(props.rentalHours ?? 48)} rental.</p>
           ) : null}
           {error ? <p role="alert" className="text-sm text-bad">{error}</p> : null}
         </div>
@@ -87,7 +87,7 @@ export function Player(props: { filmId: string; title: string; posterUrl: string
       title={props.title}
       startTime={session.startTime}
       autoPlay
-      accentColor="#e8a33d"
+      accentColor="#ffad33"
       disableCookies
       metadata={{ video_id: props.filmId, video_title: props.title }}
       onPlay={() => {

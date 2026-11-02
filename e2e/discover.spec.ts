@@ -8,7 +8,7 @@ test("discover shows curated, trending, shorts and genre shelves with prices", a
   await expect(page.getByRole("heading", { name: "Discover" })).toBeVisible();
   const staffPicks = page.getByRole("region", { name: "Staff picks" });
   await expect(staffPicks.getByRole("link", { name: /Salt & Static/ })).toBeVisible();
-  await expect(staffPicks.getByText("From $4.99")).toBeVisible();
+  await expect(staffPicks.getByText("Rent $4.99 · Buy $12.99")).toBeVisible();
   await expect(page.getByRole("region", { name: "Trending" }).getByTestId("film-card").first()).toBeVisible();
   await expect(page.getByRole("region", { name: "Shorts" }).getByRole("link", { name: /Tidepool/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "Shorts" }).getByText("Free")).toBeVisible();

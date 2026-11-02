@@ -9,9 +9,9 @@ test("a visitor sees the shareable film page with prices, license wording and cr
   const { count: before } = await admin.from("page_events").select("id", { count: "exact", head: true }).eq("film_id", SALT).eq("source", "e2e");
   await page.goto("/f/salt-and-static?ref=e2e");
   await expect(page.getByRole("heading", { level: 1, name: "Salt & Static" })).toBeVisible();
-  await expect(page.getByText("2026 · 1 h 34 min · PG-13 · Drama")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Rent $4.99 · 48 h" })).toHaveAttribute("href", "/checkout/d0000000-0000-0000-0000-000000000001");
-  await expect(page.getByRole("link", { name: "Buy $12.99" })).toBeVisible();
+  await expect(page.getByText("Drama · 2026 · 94 min · PG-13")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Rent for 48 hours $4.99" })).toHaveAttribute("href", "/checkout/d0000000-0000-0000-0000-000000000001");
+  await expect(page.getByRole("link", { name: "Buy (license) $12.99" })).toBeVisible();
   await expect(page.getByTestId("license-statement")).toContainText("license to watch, not ownership");
   await expect(page.getByRole("link", { name: "Leilani Kahale Lead actor" })).toHaveAttribute("href", "/p/leilani-kahale");
   await expect(page.getByText("Only people who rented or bought the film can review it.")).toBeVisible();
