@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { SiteHeader } from "@/components/marketing/site-header";
+import { MarketingShell } from "@/components/marketing/site-header";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { saveProfile } from "./actions";
@@ -10,15 +10,14 @@ export const metadata: Metadata = { title: "Your page", robots: { index: false }
 
 export default function ProfileSettingsPage({ searchParams }: PageProps<"/settings/profile">) {
   return (
-    <>
-      <SiteHeader />
+    <MarketingShell>
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
         <h1 className="font-display text-4xl">Your page</h1>
         <Suspense fallback={<div className="card mt-6 h-64" />}>
           <Body searchParams={searchParams} />
         </Suspense>
       </main>
-    </>
+    </MarketingShell>
   );
 }
 

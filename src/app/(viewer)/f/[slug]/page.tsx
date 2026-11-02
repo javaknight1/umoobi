@@ -9,7 +9,9 @@ import { AddToList } from "@/components/social/add-to-list";
 import { FollowButton } from "@/components/social/follow-button";
 import { ReportForm } from "@/components/social/report-form";
 import { ReviewForm } from "@/components/social/review-form";
-import { formatRuntime, LICENSE_STATEMENT, offerLabel, sortOffers } from "@/lib/films/format";
+import { LICENSE_STATEMENT, sortOffers } from "@/lib/films/format";
+import { formatCents } from "@/lib/money";
+import { Avatar } from "@/components/brand";
 import { getFilmReviews, getPublicFilm, type PublicFilm } from "@/lib/films/queries";
 import { viewerFilmState } from "@/lib/viewer";
 
@@ -36,7 +38,7 @@ export async function generateMetadata({ params }: PageProps<"/f/[slug]">): Prom
 
 export default function FilmPage({ params }: PageProps<"/f/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:py-10">
+    <main className="mx-auto w-full max-w-[90rem] flex-1 px-4 pb-16 sm:px-8 sm:pt-10">
       <Suspense fallback={<div className="aspect-video w-full animate-pulse rounded-2xl bg-surface" />}>
         <FilmBody params={params} />
       </Suspense>
@@ -49,63 +51,99 @@ async function FilmBody({ params }: Pick<PageProps<"/f/[slug]">, "params">) {
   const film = await getPublicFilm(slug);
   if (!film) notFound();
   const trailer = film.trailers[0];
-  const byline = [film.release_year, formatRuntime(film.runtime_seconds), film.content_rating, film.genre].filter(Boolean);
+  const minutes = film.runtime_seconds ? `${Math.round(film.runtime_seconds / 60)} min` : null;
+  const meta = [film.genre, film.release_year, minutes, film.content_rating].filter(Boolean);
+  const by = film.filmmaker_accounts?.display_name;
 
   return (
-    <article className="grid gap-8">
+    <article className="grid gap-12">
       <PageView filmId={film.id} />
-      <div className="grid gap-6 md:grid-cols-[1.6fr_1fr] md:gap-10">
-        <div className="grid content-start gap-4">
-          {trailer?.mux_playback_id ? (
-            <TrailerPlayer filmId={film.id} playbackId={trailer.mux_playback_id} title={`${film.title} — trailer`} poster={film.poster_url} />
-          ) : (
-            <div className="mx-auto w-48 md:w-64">
-              <Poster title={film.title} url={film.poster_url} />
-            </div>
-          )}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_minmax(0,22rem)] lg:gap-12">
+        <div className="hidden lg:block">
+          <Poster title={film.title} url={film.poster_url} slug={film.slug} by={by} className="shadow-2xl" />
         </div>
 
-        <div className="grid content-start gap-4">
+        <div className="grid content-start gap-5">
+          <div className="-mx-4 order-first sm:mx-0 lg:order-none">
+            {trailer?.mux_playback_id ? (
+              <div className="overflow-hidden sm:rounded-2xl">
+                <TrailerPlayer filmId={film.id} playbackId={trailer.mux_playback_id} title={`${film.title} — trailer`} poster={film.poster_url} />
+              </div>
+            ) : (
+              <div className="mx-auto w-48 lg:hidden">
+                <Poster title={film.title} url={film.poster_url} slug={film.slug} by={by} />
+              </div>
+            )}
+            {trailer ? (
+              <p className="mt-2 px-4 text-sm font-semibold sm:px-0">
+                Official trailer · free{film.trailers.length + film.clips.length > 1 ? <span className="font-normal text-muted"> · + {film.trailers.length - 1 + film.clips.length} more below</span> : null}
+              </p>
+            ) : null}
+          </div>
+          <p className="font-semibold text-muted">{meta.join(" · ")}</p>
+          <h1 className="font-display text-5xl leading-[0.95] sm:text-7xl">{film.title}</h1>
           {film.filmmaker_accounts ? (
-            <Link href={`/c/${film.filmmaker_accounts.slug}`} className="text-xs uppercase tracking-widest text-muted hover:text-fg">
-              {film.filmmaker_accounts.display_name}
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Avatar name={film.filmmaker_accounts.display_name} size={44} />
+              <p>
+                A film by{" "}
+                <Link href={`/c/${film.filmmaker_accounts.slug}`} className="font-semibold hover:underline">
+                  {film.filmmaker_accounts.display_name}
+                </Link>
+                {film.rating.count ? (
+                  <span className="text-muted">
+                    {" "}
+                    · {film.rating.average} ★ ({film.rating.count})
+                  </span>
+                ) : null}
+              </p>
+              <Suspense fallback={null}>
+                <FollowFilmmaker film={film} />
+              </Suspense>
+            </div>
           ) : null}
-          <h1 className="font-display text-5xl leading-none md:text-6xl">{film.title}</h1>
-          <p className="text-sm text-muted">{byline.join(" · ")}</p>
           {film.ai_generated ? (
-            <p className="flex items-center gap-2 text-sm">
+            <p className="flex flex-wrap items-center gap-2 text-sm">
               <AiBadge />
               <span className="text-muted">
-                Contains AI-generated imagery. <Link href="/legal/ai-policy" className="underline">What this means</Link>
+                Contains AI-generated imagery.{" "}
+                <Link href="/legal/ai-policy" className="underline">
+                  What this means
+                </Link>
               </span>
             </p>
           ) : null}
-          {film.rating.count ? (
-            <p className="text-sm" aria-label={`Rated ${film.rating.average} out of 5 from ${film.rating.count} reviews`}>
-              <span className="text-accent">★ {film.rating.average}</span>{" "}
-              <span className="text-muted">
-                ({film.rating.count} review{film.rating.count === 1 ? "" : "s"})
-              </span>
-            </p>
-          ) : null}
-          {film.synopsis ? <p className="text-fg/90">{film.synopsis}</p> : null}
+          {film.synopsis ? <p className="max-w-2xl text-lg text-muted sm:text-xl">{film.synopsis}</p> : null}
+        </div>
 
+        <aside className="grid content-start gap-5">
           <Suspense fallback={<Offers film={film} entitled={false} />}>
             <ViewerOffers film={film} />
           </Suspense>
-        </div>
+          {film.rating.count ? (
+            <div className="card flex items-end justify-between">
+              <div>
+                <p className="font-display text-4xl">{film.rating.average} ★</p>
+                <p className="text-sm text-muted">
+                  {film.rating.count} verified review{film.rating.count === 1 ? "" : "s"}
+                </p>
+              </div>
+            </div>
+          ) : null}
+        </aside>
       </div>
 
       <Credits film={film} />
 
       {film.clips.length ? (
-        <section className="grid gap-3" aria-label="Clips">
+        <section className="grid gap-4" aria-label="Clips">
           <h2 className="font-display text-3xl">Clips</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {film.clips.map((c) => (
               <figure key={c.id} className="grid gap-2">
-                <TrailerPlayer filmId={film.id} playbackId={c.mux_playback_id!} title={c.label ?? `${film.title} clip`} />
+                <div className="overflow-hidden rounded-2xl">
+                  <TrailerPlayer filmId={film.id} playbackId={c.mux_playback_id!} title={c.label ?? `${film.title} clip`} />
+                </div>
                 {c.label ? <figcaption className="text-sm text-muted">{c.label}</figcaption> : null}
               </figure>
             ))}
@@ -128,38 +166,60 @@ async function FilmBody({ params }: Pick<PageProps<"/f/[slug]">, "params">) {
   );
 }
 
+/** "Rent for 48 hours" / "Buy (license)" / "Watch free" (mockups 09–10). */
+function offerTitle(o: { kind: string; price_cents: number; rental_hours: number | null }) {
+  if (o.price_cents === 0) return "Watch free";
+  if (o.kind === "buy") return "Buy (license)";
+  const h = o.rental_hours ?? 48;
+  return `Rent for ${h % 24 === 0 && h > 48 ? `${h / 24} days` : `${h} hours`}`;
+}
+
 function Offers({ film, entitled }: { film: PublicFilm; entitled: boolean }) {
   const offers = sortOffers(film.offers);
   const hasBuy = offers.some((o) => o.kind === "buy" && o.price_cents > 0);
   return (
-    <div className="grid gap-3">
+    <div className="card grid gap-3 p-6">
       {entitled ? (
-        <Link href={`/watch/${film.slug}`} className="btn-primary text-base">
+        <Link href={`/watch/${film.slug}`} className="btn-primary justify-center py-4 text-lg">
           ▶ Watch now
         </Link>
       ) : null}
-      <div className="flex flex-wrap gap-2">
-        {offers.map((o) => (
-          <Link
-            key={o.id}
-            href={`/checkout/${o.id}`}
-            className={o.kind === "rent" || o.price_cents === 0 ? "btn-primary" : "btn-ghost"}
-          >
-            {offerLabel(o)}
-          </Link>
-        ))}
-      </div>
+      {offers.map((o, i) => (
+        <Link
+          key={o.id}
+          href={`/checkout/${o.id}`}
+          className={`flex items-center justify-between rounded-full px-6 py-4 text-lg font-semibold transition ${
+            i === 0 && !entitled ? "bg-accent text-accent-fg hover:brightness-105" : "border border-fg/40 hover:border-fg"
+          }`}
+        >
+          <span>{offerTitle(o)}</span>
+          <span>{o.price_cents === 0 ? "Free" : formatCents(o.price_cents)}</span>
+        </Link>
+      ))}
       {!offers.length ? <p className="text-sm text-muted">Not available to rent or buy right now.</p> : null}
       {hasBuy ? (
-        <p className="rounded-lg border border-line p-3 text-xs text-muted" data-testid="license-statement">
+        <p className="rounded-2xl border border-accent/80 bg-accent/5 p-4 text-sm" data-testid="license-statement">
           {LICENSE_STATEMENT}{" "}
           <Link href="/legal/license" className="underline">
             License terms
           </Link>
         </p>
       ) : null}
-      <p className="text-xs text-muted">Sales tax is added at checkout. Rentals start when you press play.</p>
+      <p className="text-sm text-muted">Prices plus sales tax. Watch on the web, or cast to your TV. Rentals start when you press play.</p>
     </div>
+  );
+}
+
+async function FollowFilmmaker({ film }: { film: PublicFilm }) {
+  const state = await viewerFilmState(film.id, film.account_id, []);
+  if (!film.filmmaker_accounts) return null;
+  return (
+    <FollowButton
+      target={{ accountId: film.account_id }}
+      following={state.signedIn ? state.followsAccount : null}
+      label={film.filmmaker_accounts.display_name}
+      next={`/f/${film.slug}`}
+    />
   );
 }
 
@@ -168,17 +228,7 @@ async function ViewerOffers({ film }: { film: PublicFilm }) {
   return (
     <>
       <Offers film={film} entitled={state.entitled} />
-      <div className="flex flex-wrap items-center gap-3">
-        {film.filmmaker_accounts ? (
-          <FollowButton
-            target={{ accountId: film.account_id }}
-            following={state.signedIn ? state.followsAccount : null}
-            label={film.filmmaker_accounts.display_name}
-            next={`/f/${film.slug}`}
-          />
-        ) : null}
-        {state.signedIn ? <AddToList filmId={film.id} lists={state.lists} /> : null}
-      </div>
+      {state.signedIn ? <AddToList filmId={film.id} lists={state.lists} /> : null}
     </>
   );
 }
@@ -186,15 +236,18 @@ async function ViewerOffers({ film }: { film: PublicFilm }) {
 function Credits({ film }: { film: PublicFilm }) {
   if (!film.credits.length) return null;
   return (
-    <section className="grid gap-3" aria-label="Cast and crew">
+    <section className="grid gap-5" aria-label="Cast and crew">
       <h2 className="font-display text-3xl">Cast and crew</h2>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      <ul className="flex flex-wrap gap-x-10 gap-y-5">
         {film.credits.map((c) =>
           c.people ? (
             <li key={`${c.people.id}-${c.role}`}>
-              <Link href={`/p/${c.people.slug}`} className="card grid gap-0.5 p-3 hover:border-fg/40">
-                <span className="font-medium">{c.people.name}</span>
-                <span className="text-xs text-muted">{c.role}</span>
+              <Link href={`/p/${c.people.slug}`} className="group flex items-center gap-3">
+                <Avatar name={c.people.name} photo={c.people.photo_url ?? null} size={56} />
+                <span className="grid">
+                  <span className="font-semibold group-hover:underline">{c.people.name}</span>
+                  <span className="text-sm text-muted">{c.role}</span>
+                </span>
               </Link>
             </li>
           ) : null,
@@ -203,7 +256,6 @@ function Credits({ film }: { film: PublicFilm }) {
     </section>
   );
 }
-
 async function ViewerReview({ film }: { film: PublicFilm }) {
   const state = await viewerFilmState(film.id, film.account_id, []);
   if (state.myReview || state.canReview) return <ReviewForm filmId={film.id} existing={state.myReview} />;

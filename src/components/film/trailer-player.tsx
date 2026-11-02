@@ -28,7 +28,7 @@ export function TrailerPlayer({
       metadata={{ video_title: title }}
       disableTracking
       disableCookies
-      accentColor="#e8a33d"
+      accentColor="#ffad33"
       className="aspect-video w-full overflow-hidden rounded-2xl"
       onPlay={() => {
         if (!sent.current) {

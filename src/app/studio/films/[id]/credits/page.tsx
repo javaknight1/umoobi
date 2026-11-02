@@ -41,15 +41,37 @@ async function Body({ params }: Pick<PageProps<"/studio/films/[id]/credits">, "p
     }));
 
   return (
-    <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-4xl">Credits</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted">
-          List your cast and crew. Everyone gets a public page they can claim. Record each person&apos;s revenue share now;
-          automatic split payouts start in a later release (D15). Shares must total 100%, or leave them all empty.
-        </p>
+    <div className="grid items-start gap-6 xl:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-4">
+        <div>
+          <h2 className="font-display text-3xl">Credits</h2>
+          <p className="mt-1 max-w-2xl text-muted">List your cast and crew. Shares must total 100%, or leave them all empty.</p>
+        </div>
+        <CreditsEditor filmId={film.id} initial={rows} />
       </div>
-      <CreditsEditor filmId={film.id} initial={rows} />
+      <aside className="grid gap-5">
+        <section className="sidebar rounded-2xl p-7">
+          <h2 className="font-display text-2xl">Revenue splits are saved, not paid yet</h2>
+          <p className="mt-3 text-fg/85">
+            Shares you set here are stored with the film. Automatic payouts to your cast and crew switch on in a later
+            release, and everyone with a share will be asked to connect a payout account.
+          </p>
+        </section>
+        <section className="card grid gap-3">
+          <h2 className="font-display text-xl">How credit pages work</h2>
+          <p className="text-muted">
+            Each person gets a public page listing their films. When they claim it, they can add a photo and bio. Viewers can
+            follow them.
+          </p>
+          {rows.some((r) => !r.person.claimed) ? (
+            <p className="rounded-xl bg-surface-2 p-3 text-sm">
+              {rows.filter((r) => !r.person.claimed).length} credited{" "}
+              {rows.filter((r) => !r.person.claimed).length === 1 ? "person hasn't" : "people haven't"} claimed their page yet. Use
+              &ldquo;Invite to claim&rdquo; in the list.
+            </p>
+          ) : null}
+        </section>
+      </aside>
     </div>
   );
 }

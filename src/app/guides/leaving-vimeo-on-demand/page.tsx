@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteFooter, SiteHeader } from "@/components/marketing/site-header";
+import { MarketingShell } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
   title: "Leaving Vimeo On Demand: what to download before November 20",
@@ -20,8 +20,7 @@ const DOWNLOAD = [
 
 export default function Guide() {
   return (
-    <>
-      <SiteHeader />
+    <MarketingShell>
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-16">
         <p className="text-sm font-medium uppercase tracking-widest text-accent">Guide</p>
         <h1 className="mt-2 font-display text-5xl leading-tight">Leaving Vimeo On Demand</h1>
@@ -65,7 +64,6 @@ export default function Guide() {
           Join the waitlist
         </Link>
       </main>
-      <SiteFooter />
-    </>
+    </MarketingShell>
   );
 }

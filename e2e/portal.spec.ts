@@ -10,11 +10,11 @@ test.beforeAll(async () => {
 
 test("Maya sees her last 30 days, statement and analytics", async ({ page }) => {
   await signInAs(page, "maya@umoobi.test", { next: "/studio" });
-  await expect(page.getByRole("heading", { name: "Last 30 days" })).toBeVisible();
-  await expect(page.locator("figcaption", { hasText: "Daily sales" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
+  await expect(page.locator("figcaption", { hasText: "Daily rentals and purchases" })).toBeVisible();
 
   await page.getByRole("link", { name: "Money" }).click();
-  await expect(page.getByRole("heading", { name: "Money" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Every sale, line by line" })).toBeVisible();
   const row = page.locator("tr", { hasText: "Salt & Static" }).filter({ hasText: "Rental" }).first();
   await expect(row).toContainText("$4.99");
   await expect(row).toContainText("−$0.50");

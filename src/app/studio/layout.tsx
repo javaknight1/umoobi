@@ -1,40 +1,50 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { UserMenu } from "@/components/app/user-menu";
+import { AppShell, UserChip } from "@/components/app/app-shell";
+import type { NavGroup } from "@/components/app/side-nav";
+import { getSessionUser } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
 
-const NAV = [
-  ["/studio", "Dashboard"],
-  ["/studio/films", "Films"],
-  ["/studio/money", "Money"],
-  ["/studio/analytics", "Analytics"],
-] as const;
-
-/** Filmmaker side: light. */
+/** Filmmaker side: light page, navy sidebar (mockups 03–08). */
 export default function StudioLayout({ children }: LayoutProps<"/studio">) {
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-6">
-            <Link href="/studio" className="font-display text-2xl">
-              Umoobi <span className="text-base text-muted">Studio</span>
-            </Link>
-            <nav className="flex flex-wrap gap-4 text-sm">
-              {NAV.map(([href, label]) => (
-                <Link key={href} href={href} className="text-muted hover:text-fg">
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <nav className="text-sm">
-            <Suspense fallback={<span className="text-muted">…</span>}>
-              <UserMenu />
-            </Suspense>
-          </nav>
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
-    </div>
+    <AppShell groups={GROUPS} user={<StudioUser />}>
+      {children}
+    </AppShell>
+  );
+}
+
+const GROUPS: NavGroup[] = [
+  {
+    title: "Studio",
+    items: [
+      { href: "/studio", label: "Dashboard", exact: true },
+      { href: "/studio/films", label: "Films" },
+      { href: "/studio/analytics", label: "Analytics" },
+      { href: "/studio/money", label: "Money" },
+    ],
+  },
+  {
+    title: "Your page",
+    items: [
+      { href: "/studio/people", label: "Credits & people" },
+      { href: "/studio/profile", label: "Public profile" },
+      { href: "/settings/security", label: "Settings" },
+    ],
+  },
+];
+
+async function StudioUser() {
+  const user = await getSessionUser();
+  if (!user) return null;
+  const supabase = await createClient();
+  const { data: account } = await supabase
+    .from("filmmaker_accounts")
+    .select("display_name, tier")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+  return (
+    <UserChip
+      name={user.displayName ?? account?.display_name ?? user.email ?? "Filmmaker"}
+      role={account ? `${account.tier === "established" ? "Established" : "New"} filmmaker · ${account.display_name}` : "Filmmaker"}
+    />
   );
 }

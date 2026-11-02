@@ -1,33 +1,38 @@
-import Link from "next/link";
+import { AppShell, UserChip } from "@/components/app/app-shell";
+import type { NavGroup } from "@/components/app/side-nav";
+import { getSessionUser } from "@/lib/auth/session";
 
-const NAV = [
-  ["/staff", "Review queue"],
-  ["/staff/takedowns", "Takedowns"],
-  ["/staff/payouts", "Payout holds"],
-  ["/staff/shelves", "Shelves"],
-  ["/staff/waitlist", "Waitlist"],
-  ["/staff/jobs", "Jobs"],
-] as const;
-
-/** Staff tools. Every page calls requireStaff (role + TOTP, aal2) itself. */
+/** Staff tools (mockup 16). Every page calls requireStaff (role + TOTP, aal2) itself. */
 export default function StaffLayout({ children }: LayoutProps<"/staff">) {
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="border-b border-line bg-fg text-bg">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-6 px-4 py-3">
-          <Link href="/staff" className="font-display text-2xl">
-            Umoobi <span className="text-base opacity-70">Staff</span>
-          </Link>
-          <nav className="flex flex-wrap gap-4 text-sm opacity-80">
-            {NAV.map(([href, label]) => (
-              <Link key={href} href={href} className="hover:opacity-100">
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
-      <div className="flex flex-1 flex-col">{children}</div>
-    </div>
+    <AppShell groups={GROUPS} user={<StaffUser />}>
+      {children}
+    </AppShell>
   );
+}
+
+const GROUPS: NavGroup[] = [
+  {
+    title: "Staff tools",
+    items: [
+      { href: "/staff", label: "Review queue", exact: true },
+      { href: "/staff/takedowns", label: "Takedown requests" },
+      { href: "/staff/payouts", label: "Payout holds" },
+      { href: "/staff/jobs", label: "Jobs" },
+    ],
+  },
+  {
+    title: "Platform",
+    items: [
+      { href: "/staff/shelves", label: "Featured shelves" },
+      { href: "/staff/waitlist", label: "Waitlist" },
+      { href: "/settings/security", label: "Settings" },
+    ],
+  },
+];
+
+async function StaffUser() {
+  const user = await getSessionUser();
+  if (!user) return null;
+  return <UserChip name={user.displayName ?? user.email ?? "Staff"} role="Reviewer" />;
 }

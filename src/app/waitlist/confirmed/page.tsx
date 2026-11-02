@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { SiteHeader } from "@/components/marketing/site-header";
+import { MarketingShell } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = { title: "You're on the list", robots: { index: false } };
 
 export default function ConfirmedPage({ searchParams }: PageProps<"/waitlist/confirmed">) {
   return (
-    <>
-      <SiteHeader />
+    <MarketingShell>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-4 px-4 py-20">
         <Suspense fallback={<h1 className="font-display text-5xl">One moment…</h1>}>
           <Body searchParams={searchParams} />
         </Suspense>
       </main>
-    </>
+    </MarketingShell>
   );
 }
 

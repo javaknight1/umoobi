@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Waitlist · Staff", robots: { index:
 
 export default function StaffWaitlistPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+    <div className="w-full">
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-display text-4xl">Waitlist</h1>
         <a href="/staff/waitlist/export" className="btn-ghost">
@@ -19,7 +19,7 @@ export default function StaffWaitlistPage() {
       <Suspense fallback={<p className="mt-8 text-muted">Loading…</p>}>
         <Stats />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

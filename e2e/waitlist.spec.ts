@@ -4,8 +4,8 @@ import { appEmail, uniqueEmail } from "./helpers";
 test("a filmmaker joins the waitlist and confirms by email", async ({ page, request }) => {
   const email = uniqueEmail("maya");
   await page.goto("/?ref=instagram");
-  await expect(page.getByRole("heading", { name: /Sell your film from one link/ })).toBeVisible();
-  await expect(page.getByText("You earn").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Your film is finished/ })).toBeVisible();
+  await expect(page.getByText("You get", { exact: true })).toBeVisible();
 
   const form = page.locator("#waitlist form");
   await form.getByLabel("Email", { exact: true }).fill(email);

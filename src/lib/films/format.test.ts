@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRuntime, fromPrice, offerLabel, sortOffers } from "./format";
+import { formatRuntime, fromPrice, offerLabel, priceLine, sortOffers } from "./format";
 
 describe("film formatting", () => {
   it("formats runtimes", () => {
@@ -23,6 +23,11 @@ describe("film formatting", () => {
     expect(fromPrice(offers)).toBe("From $4.99");
     expect(fromPrice([{ kind: "buy", price_cents: 0, rental_hours: null }])).toBe("Free");
     expect(fromPrice([])).toBeNull();
+    expect(priceLine([{ kind: "buy", price_cents: 1299, rental_hours: null }, { kind: "rent", price_cents: 499, rental_hours: 48 }])).toBe(
+      "Rent $4.99 · Buy $12.99",
+    );
+    expect(priceLine([{ kind: "buy", price_cents: 0, rental_hours: null }])).toBe("Free");
+    expect(priceLine([])).toBeNull();
     expect(sortOffers(offers)[0].kind).toBe("rent");
   });
 });

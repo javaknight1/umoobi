@@ -30,6 +30,15 @@ export function fromPrice(offers: OfferLike[]): string | null {
   return min === 0 ? "Free" : `From ${formatCents(min)}`;
 }
 
+/** Every way in, for film cards: "Rent $4.99 · Buy $12.99" or "Free". */
+export function priceLine(offers: OfferLike[]): string | null {
+  if (!offers.length) return null;
+  if (offers.some((o) => o.price_cents === 0)) return "Free";
+  return sortOffers(offers)
+    .map((o) => `${o.kind === "rent" ? "Rent" : "Buy"} ${formatCents(o.price_cents)}`)
+    .join(" · ");
+}
+
 /** Rentals first, then buy. */
 export function sortOffers<T extends OfferLike>(offers: T[]): T[] {
   return [...offers].sort((a, b) => (a.kind === b.kind ? a.price_cents - b.price_cents : a.kind === "rent" ? -1 : 1));

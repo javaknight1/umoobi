@@ -25,7 +25,7 @@ async function Details({ params }: Pick<PageProps<"/studio/films/[id]">, "params
   return (
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-4xl">{film.title}</h1>
+        <h2 className="font-display text-3xl">Details</h2>
         <FilmStatus status={film.status} />
       </div>
 
