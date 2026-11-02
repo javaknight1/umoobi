@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Logo } from "@/components/brand";
 import { safeNextPath } from "@/lib/auth/next-path";
 import { SignInForm } from "./sign-in-form";
 
@@ -8,15 +9,20 @@ export const metadata: Metadata = { title: "Sign in" };
 
 export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-16">
-      <Link href="/" className="font-display text-2xl">
-        Umoobi
-      </Link>
-      <h1 className="font-display text-4xl">Sign in</h1>
-      <Suspense fallback={<div className="h-40" />}>
-        <SignInBody searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <div className="theater flex min-h-full flex-1 flex-col">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-4 py-16">
+        <Logo />
+        <div className="card grid gap-5 p-8">
+          <h1 className="font-display text-4xl">Sign in</h1>
+          <Suspense fallback={<div className="h-40" />}>
+            <SignInBody searchParams={searchParams} />
+          </Suspense>
+        </div>
+        <p className="text-center text-sm text-muted">
+          New here? Enter your email and we&apos;ll set up your account. <Link href="/" className="underline">What is Umoobi?</Link>
+        </p>
+      </main>
+    </div>
   );
 }
 

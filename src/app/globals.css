@@ -1,51 +1,93 @@
 @import "tailwindcss";
 
 /*
- * Two surfaces share one set of tokens: the filmmaker side is light (paper), the viewer
- * side is dark like a theater. Wrap viewer pages in `.theater` to switch.
+ * Umoobi design tokens, from the MVP mockups. Two surfaces share one set of names:
+ * - default (:root): the studio and staff tools — light lavender-gray page, white cards,
+ *   navy ink, amber primary.
+ * - `.theater`: the viewer and marketing side — deep navy, lighter navy cards, amber primary.
+ * `.sidebar` is the navy rail beside studio and staff pages.
  */
 :root {
-  --bg: #f6f3ec;
+  --bg: #efeef5;
   --surface: #ffffff;
-  --fg: #17140f;
-  --muted: #6b645a;
-  --line: #e2dccf;
-  --accent: #c2410c;
-  --accent-fg: #ffffff;
-  --marquee: #e8a33d;
-  --ok: #2f7d4f;
-  --warn: #a16207;
-  --bad: #b42318;
+  --surface-2: #f6f5fa;
+  --fg: #1a1730;
+  --muted: #5f5a78;
+  --line: #e1dfeb;
+  --accent: #ffad33;
+  --accent-fg: #1a1730;
+  --ink: #1a1730;
+  --ink-fg: #ffffff;
+  --ok: #1f9e8a;
+  --warn: #b26b00;
+  --bad: #d23d63;
+  --chart: #7a6cf0;
+  --chart-soft: #b9b1f6;
 }
 
 .theater {
-  --bg: #0f0e0c;
-  --surface: #1a1815;
-  --fg: #f2ede4;
-  --muted: #a39b8f;
-  --line: #2d2a25;
-  --accent: #e8a33d;
-  --accent-fg: #17140f;
-  --ok: #5fbf85;
-  --warn: #e3b341;
-  --bad: #f07167;
+  --bg: #1a1730;
+  --surface: #221f3d;
+  --surface-2: #2a2648;
+  --fg: #f1eefb;
+  --muted: #a7a2c3;
+  --line: #36325a;
+  --accent: #ffad33;
+  --accent-fg: #1a1730;
+  --ink: #f1eefb;
+  --ink-fg: #1a1730;
+  --ok: #3cc4a9;
+  --warn: #ffc266;
+  --bad: #f2769a;
+  --chart: #8f80f2;
+  --chart-soft: #4b4580;
+}
+
+/* A white card inside a dark page (checkout order card, mockup 11). */
+.paper {
+  --bg: #efeef5;
+  --surface: #ffffff;
+  --surface-2: #f6f5fa;
+  --fg: #1a1730;
+  --muted: #5f5a78;
+  --line: #e1dfeb;
+  --ink: #1a1730;
+  --ink-fg: #ffffff;
+  --ok: #1f9e8a;
+  --warn: #b26b00;
+  --bad: #d23d63;
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.sidebar {
+  --surface: #221f3d;
+  --fg: #f1eefb;
+  --muted: #a7a2c3;
+  --line: #36325a;
+  background: #1a1730;
+  color: var(--fg);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
-  --color-marquee: var(--marquee);
+  --color-ink: var(--ink);
+  --color-ink-fg: var(--ink-fg);
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-bad: var(--bad);
-  --font-sans: var(--font-geist-sans);
+  --color-chart: var(--chart);
+  --color-chart-soft: var(--chart-soft);
+  --font-sans: var(--font-brand);
+  --font-display: var(--font-brand);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-display-serif);
 }
 
 body {
@@ -58,21 +100,71 @@ body {
   color: var(--fg);
 }
 
+/* Headings are bold and tight, like the mockups. */
+.font-display {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Checkbox drawn as a toggle switch (pricing, mockup 04). Still a native checkbox for a11y. */
+input[type="checkbox"].switch {
+  appearance: none;
+  position: relative;
+  width: 3.25rem;
+  height: 1.9rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--line);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+input[type="checkbox"].switch::after {
+  content: "";
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  transition: transform 0.15s;
+}
+input[type="checkbox"].switch:checked {
+  background: var(--ok);
+}
+input[type="checkbox"].switch:checked::after {
+  transform: translateX(1.35rem);
+}
+input[type="checkbox"].switch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:opacity-50;
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-accent text-accent-fg hover:brightness-110;
+  @apply btn bg-accent text-accent-fg hover:brightness-105;
 }
 @utility btn-ghost {
-  @apply btn border border-line bg-surface text-fg hover:border-fg/40;
+  @apply btn border border-fg/25 bg-transparent text-fg hover:border-fg/60;
+}
+@utility btn-dark {
+  @apply btn bg-ink text-ink-fg hover:opacity-90;
 }
 @utility field {
-  @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-fg outline-none focus:border-accent;
+  @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-fg outline-none placeholder:text-muted/70 focus:border-accent;
 }
 @utility label {
-  @apply text-sm font-medium;
+  @apply text-sm font-semibold;
 }
 @utility card {
-  @apply rounded-2xl border border-line bg-surface p-5;
+  @apply rounded-2xl border border-line bg-surface p-6;
+}
+@utility pill {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+@utility eyebrow {
+  @apply text-sm font-medium text-muted;
 }

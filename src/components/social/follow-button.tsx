@@ -21,7 +21,7 @@ export function FollowButton({
 
   if (following === null) {
     return (
-      <a href={`/sign-in?next=${encodeURIComponent(next)}`} className="btn-ghost px-4 py-1.5">
+      <a href={`/sign-in?next=${encodeURIComponent(next)}`} className="btn-primary px-4 py-1.5">
         Follow {label}
       </a>
     );
