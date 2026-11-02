@@ -27,7 +27,7 @@ test("a viewer buys Salt & Static after acknowledging the license, then watches 
   const email = uniqueEmail("jordan");
   await signInAs(page, email, { next: `/checkout/${SALT_BUY}` });
   await expect(page.getByRole("heading", { name: "Salt & Static" })).toBeVisible();
-  await expect(page.getByText("Added at checkout")).toBeVisible();
+  await expect(page.getByText("Calculated at payment")).toBeVisible();
 
   const buy = page.getByRole("button", { name: "Continue to payment" });
   await expect(buy).toBeDisabled();

@@ -17,7 +17,7 @@ test("a filmmaker lists credits with shares that total 100%, and a crew member c
   const newName = `Nova Crew ${tag}`;
   try {
     await signInExisting(page, "maya@umoobi.test", `/studio/films/${film!.id}/credits`);
-    await expect(page.getByRole("heading", { name: "Credits" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Credits", exact: true })).toBeVisible();
 
     await page.getByLabel("Add a person").fill("Leilani");
     await page.getByRole("button", { name: /^Leilani Kahale/ }).click();

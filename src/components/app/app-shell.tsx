@@ -19,7 +19,7 @@ export function AppShell({
   return (
     <div className="flex min-h-full flex-1 flex-col lg:flex-row">
       {/* The rail stretches with the page; its contents stay pinned to the viewport. */}
-      <aside className="sidebar sticky top-0 z-20 lg:static lg:w-80 lg:shrink-0">
+      <aside className="sidebar z-20 lg:w-80 lg:shrink-0">
         <div className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
           <div className="px-4 py-4 lg:px-7 lg:pb-10 lg:pt-8">
             <Logo href="/" />
@@ -63,7 +63,7 @@ export function UserChip({ name, role, compact = false }: { name: string; role: 
 /** Page title block: small breadcrumb/eyebrow line, big title, actions on the right. */
 export function PageHeader({ eyebrow, title, actions }: { eyebrow?: React.ReactNode; title: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         <h1 className="font-display text-4xl sm:text-5xl">{title}</h1>

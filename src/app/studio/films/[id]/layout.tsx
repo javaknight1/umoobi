@@ -7,7 +7,7 @@ import { FilmTabs } from "./film-tabs";
 /** One film's editor (mockup 03): breadcrumb, title, Save draft / Publish, five-step stepper. */
 export default function FilmLayout({ children, params }: LayoutProps<"/studio/films/[id]">) {
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
       <Suspense fallback={<div className="h-24" />}>
         <FilmHeader params={params} />
       </Suspense>
