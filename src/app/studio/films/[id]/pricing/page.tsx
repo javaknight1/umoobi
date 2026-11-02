@@ -28,7 +28,7 @@ async function Pricing({ params }: Pick<PageProps<"/studio/films/[id]/pricing">,
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="font-display text-4xl">Pricing</h1>
+        <h2 className="font-display text-3xl">Pricing and free footage</h2>
         <p className="mt-1 text-muted">
           {film.title}. Turn on rent, buy or both. Buyers pay your price plus sales tax, which Umoobi collects and pays.
         </p>

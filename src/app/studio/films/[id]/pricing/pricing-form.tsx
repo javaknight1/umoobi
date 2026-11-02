@@ -120,10 +120,10 @@ function OfferCard(props: {
   const id = props.title.toLowerCase();
   const preview = props.cents !== null && !props.error ? previewSale(props.cents, props.feeBps) : null;
   return (
-    <fieldset className={`card grid content-start gap-3 ${props.on ? "" : "opacity-70"}`}>
+    <fieldset className={`card grid content-start gap-4 ${props.on ? "border-ok/50" : "opacity-75"}`}>
       <legend className="sr-only">{props.title}</legend>
-      <label className="flex items-center gap-2 font-medium">
-        <input type="checkbox" checked={props.on} onChange={(e) => props.setOn(e.target.checked)} />
+      <label className="flex items-center gap-3 text-lg font-semibold">
+        <input type="checkbox" className="switch" checked={props.on} onChange={(e) => props.setOn(e.target.checked)} />
         Offer {props.title.toLowerCase()}
       </label>
       <label className="grid gap-1">
@@ -144,7 +144,7 @@ function OfferCard(props: {
       </label>
       {props.children}
       {preview && props.on ? (
-        <div className="grid gap-1 rounded-xl bg-bg p-3 font-mono text-sm" aria-label={`${props.title} per-sale preview`}>
+        <div className="grid gap-1.5 rounded-2xl bg-surface-2 p-4 text-[0.95rem] tabular-nums" aria-label={`${props.title} per-sale preview`}>
           <Line k="Your price" v={formatCents(preview.priceCents)} />
           <Line k={`Umoobi fee (${props.founding ? "5%, founding" : "10%"})`} v={`−${formatCents(preview.feeCents)}`} />
           <Line k="Card processing (est.)" v={`−${formatCents(preview.processingCents)}`} />
@@ -160,7 +160,7 @@ function OfferCard(props: {
 function Line({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
   return (
     <p className={`flex justify-between ${strong ? "font-semibold" : ""}`}>
-      <span className="font-sans text-muted">{k}</span>
+      <span className="text-muted">{k}</span>
       <span>{v}</span>
     </p>
   );

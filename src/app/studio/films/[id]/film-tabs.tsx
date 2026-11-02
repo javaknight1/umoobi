@@ -3,30 +3,32 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 
-const TABS = [
+/** Mockup 03's five steps, mapped onto the film's tabs. Publishing is the header button. */
+const STEPS = [
+  ["/uploads", "Upload & checks"],
   ["", "Details"],
-  ["/uploads", "Uploads"],
-  ["/credits", "Credits"],
   ["/pricing", "Pricing"],
-  ["/publish", "Publish"],
+  ["/uploads#clips", "Trailers & clips"],
+  ["/credits", "Credits"],
 ] as const;
 
-/** Tabs for one film. Client-side so the layout doesn't block on params. */
 export function FilmTabs() {
   const { id } = useParams<{ id: string }>();
   const pathname = usePathname();
   return (
-    <nav className="flex flex-wrap gap-2 border-b border-line pb-3 text-sm" aria-label="Film sections">
-      {TABS.map(([path, label]) => {
+    <nav className="flex flex-wrap gap-2" aria-label="Film sections">
+      {STEPS.map(([path, label], i) => {
         const href = `/studio/films/${id}${path}`;
-        const active = pathname === href;
+        // "Trailers & clips" shares the uploads page, so only "Upload & checks" lights up there.
+        const active = !path.includes("#") && pathname === href;
         return (
           <Link
             key={label}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-full border px-3 py-1 ${active ? "border-fg bg-fg text-bg" : "border-line hover:border-fg/40"}`}
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${active ? "bg-ink text-ink-fg" : "bg-surface text-fg hover:bg-surface-2"}`}
           >
+            <span className="mr-1 opacity-70">{i + 1}</span>
             {label}
           </Link>
         );
