@@ -8,13 +8,13 @@ export const metadata: Metadata = { title: "Shelves · Staff", robots: { index: 
 
 export default function StaffShelvesPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+    <div className="w-full">
       <h1 className="font-display text-4xl">Featured shelves</h1>
       <p className="mt-1 text-sm text-muted">Staff-curated rows on Discover. Trending, new, genre and shorts shelves fill themselves.</p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading…</p>}>
         <Shelves />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

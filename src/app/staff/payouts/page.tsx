@@ -10,12 +10,12 @@ export const metadata: Metadata = { title: "Payouts · Staff", robots: { index: 
 
 export default function PayoutsPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+    <div className="w-full">
       <h1 className="font-display text-4xl">Payouts and holds</h1>
       <Suspense fallback={<p className="mt-8 text-muted">Loading…</p>}>
         <Body />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

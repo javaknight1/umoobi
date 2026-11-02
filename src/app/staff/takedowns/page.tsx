@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Takedowns · Staff", robots: { index
 
 export default function TakedownsPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+    <div className="w-full">
       <h1 className="font-display text-4xl">Copyright takedowns</h1>
       <p className="mt-1 text-sm text-muted">
         Valid notice → take down and strike. Counter-notice → restore after 10 business days unless the claimant files suit.
@@ -16,7 +16,7 @@ export default function TakedownsPage() {
       <Suspense fallback={<p className="mt-8 text-muted">Loading…</p>}>
         <List />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

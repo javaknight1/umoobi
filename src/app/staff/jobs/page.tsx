@@ -8,13 +8,13 @@ export const metadata: Metadata = { title: "Jobs · Staff", robots: { index: fal
 
 export default function JobsPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+    <div className="w-full">
       <h1 className="font-display text-4xl">Background jobs</h1>
       <p className="mt-1 text-sm text-muted">Checks, refunds, payouts and emails. Failed jobs stop after 5 tries.</p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading…</p>}>
         <Jobs />
       </Suspense>
-    </main>
+    </div>
   );
 }
 
