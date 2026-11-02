@@ -22,16 +22,23 @@ export async function POST(request: NextRequest) {
   const { filmId, position, event } = parsed.data;
   const seconds = Math.floor(position);
 
+  // Only a viewer who holds the film can report playback, so analytics can't be inflated.
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return NextResponse.json({ error: "Sign in" }, { status: 401 });
+  const { count } = await supabase
+    .from("entitlements")
+    .select("id", { count: "exact", head: true })
+    .eq("film_id", filmId)
+    .is("revoked_at", null);
+  if (!count) return NextResponse.json({ error: "No access" }, { status: 403 });
+
+  // The analytics row carries an anonymous session id, never the user (D38).
   await createAdminClient()
     .from("playback_events")
     .insert({ session_id: await sessionId(), film_id: filmId, position_seconds: seconds, event });
-
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (auth.user) {
-    await supabase
-      .from("watch_progress")
-      .upsert({ viewer_id: auth.user.id, film_id: filmId, position_seconds: seconds, updated_at: new Date().toISOString() });
-  }
+  await supabase
+    .from("watch_progress")
+    .upsert({ viewer_id: auth.user.id, film_id: filmId, position_seconds: seconds, updated_at: new Date().toISOString() });
   return NextResponse.json({ ok: true });
 }

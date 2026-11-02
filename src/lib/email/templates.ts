@@ -1,6 +1,11 @@
 import type { Email } from "./index";
 import { siteName } from "@/lib/site";
 
+/** HTML-escapes text placed into email HTML. Every user-supplied value goes through this. */
+export function esc(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+}
+
 /** Minimal, accessible HTML wrapper shared by every transactional email. */
 export function layout(title: string, bodyHtml: string): string {
   return `<!doctype html><html><body style="margin:0;background:#f6f3ec;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#17140f">

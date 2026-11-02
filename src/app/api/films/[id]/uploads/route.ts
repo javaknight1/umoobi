@@ -44,7 +44,8 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/films/[
     if (old) {
       if (old.mux_asset_id) await video().deleteAsset(old.mux_asset_id).catch(() => undefined);
       await db.from("film_assets").delete().eq("id", old.id);
-      await db.from("films").update({ status: "draft", vetting_score: null, ai_flagged: false }).eq("id", id);
+      // A new master is new content: earlier scores and staff approval no longer apply.
+      await db.from("films").update({ status: "draft", vetting_score: null, ai_flagged: false, staff_approved: false }).eq("id", id);
     }
   }
 

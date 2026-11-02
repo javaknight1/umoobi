@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sendEmail } from "@/lib/email";
-import { button, layout } from "@/lib/email/templates";
+import { button, esc, layout } from "@/lib/email/templates";
 import { siteUrl } from "@/lib/site";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -35,21 +35,36 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/people/
 
   const { data: account } = await admin
     .from("filmmaker_accounts")
-    .select("display_name")
+    .select("display_name, status")
     .eq("id", person.created_by_account!)
     .single();
+  if (account?.status !== "approved") {
+    return NextResponse.json({ error: "Invites open once your filmmaker account is approved." }, { status: 403 });
+  }
+  // Limits so invites can't be used to send bulk email: one per person a day, 30 per account a day.
+  const dayAgo = new Date(Date.now() - 86400_000).toISOString();
+  const { data: recent } = await admin.from("people").select("invited_at").eq("id", id).single();
+  if (recent?.invited_at && recent.invited_at > dayAgo) {
+    return NextResponse.json({ error: "You already invited this person today." }, { status: 429 });
+  }
+  const { count } = await admin
+    .from("people")
+    .select("id", { count: "exact", head: true })
+    .eq("created_by_account", person.created_by_account!)
+    .gt("invited_at", dayAgo);
+  if ((count ?? 0) >= 30) return NextResponse.json({ error: "Daily invite limit reached. Try again tomorrow." }, { status: 429 });
   const token = crypto.randomUUID();
-  await admin.from("people").update({ invite_token: token, invite_email: email }).eq("id", id);
+  await admin.from("people").update({ invite_token: token, invite_email: email, invited_at: new Date().toISOString() }).eq("id", id);
 
   const link = `${siteUrl}/claim/${token}`;
-  const from = account?.display_name ?? "A filmmaker";
+  const from = (account?.display_name ?? "A filmmaker").replace(/[\r\n]+/g, " ").slice(0, 100);
   await sendEmail({
     to: email,
     subject: `${from} credited you on Umoobi`,
     text: `${from} listed you in the credits of their film on Umoobi. Claim your page to add a photo and bio: ${link}\n`,
     html: layout(
       "Claim your page",
-      `<p>${from} listed you, ${person.name}, in the credits of their film on Umoobi. Claim your page to add a photo and bio, and let viewers follow your work.</p>${button(link, "Claim my page")}`,
+      `<p>${esc(from)} listed you, ${esc(person.name)}, in the credits of their film on Umoobi. Claim your page to add a photo and bio, and let viewers follow your work.</p>${button(link, "Claim my page")}`,
     ),
   });
   return NextResponse.json({ ok: true });

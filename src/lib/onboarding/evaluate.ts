@@ -16,7 +16,8 @@ export async function evaluateAccount(accountId: string): Promise<void> {
   if (!acct) return;
 
   const p = payments();
-  let identityStatus = acct.identity_status;
+  // Only an ID check we started counts; a stored status without a session is never trusted.
+  let identityStatus = acct.identity_session_id ? acct.identity_status : acct.status === "applying" ? "none" : acct.identity_status;
   let verifiedName: string | null = null;
   if (acct.identity_session_id) {
     const r = await p.getIdentity(acct.identity_session_id);

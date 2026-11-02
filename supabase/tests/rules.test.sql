@@ -67,9 +67,9 @@ select throws_ok($$ insert into public.films (account_id, slug, title, runtime_s
   '23514', null, 'a new account cannot add a 4th feature in a year');
 select is(public.films_used('10000000-0000-0000-0000-000000000001', extract(year from now())::int, 'feature'), 3,
   'films_used counts features this year');
-select lives_ok($$ insert into public.films (account_id, slug, title, runtime_seconds, cap_year) values
-  ('10000000-0000-0000-0000-000000000001', 'feature-next-year', 'Next Year', 3000, extract(year from now())::int + 1) $$,
-  'the cap resets each calendar year');
+select throws_ok($$ insert into public.films (account_id, slug, title, runtime_seconds, cap_year) values
+  ('10000000-0000-0000-0000-000000000001', 'feature-backdated', 'Backdated', 3000, 1999) $$,
+  '23514', null, 'a backdated cap year is ignored, so the cap still applies');
 update public.filmmaker_accounts set tier = 'established' where id = '10000000-0000-0000-0000-000000000001';
 select lives_ok($$ insert into public.films (account_id, slug, title, runtime_seconds) values
   ('10000000-0000-0000-0000-000000000001', 'feature-five', 'Feature Five', 3000) $$, 'established accounts get 12 features');
@@ -95,7 +95,7 @@ set constraints credits_shares deferred;
 
 -- ─── Publishing (D11, D42, D46) ─────────────────────────────────────────────
 select ok(cardinality(public.publish_blockers('20000000-0000-0000-0000-000000000001')) >= 3, 'a fresh film has publish blockers');
-update public.films set ai_declared_at = now(), rights_statement_at = now(), vetting_score = 97
+update public.films set ai_declared_at = now(), rights_statement_at = now(), vetting_score = 97, status = 'ready'
   where id = '20000000-0000-0000-0000-000000000001';
 insert into public.film_assets (film_id, kind, status, mux_playback_id) values
   ('20000000-0000-0000-0000-000000000001', 'master', 'ready', 'dev-playback');

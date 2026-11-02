@@ -27,7 +27,7 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   const db = createAdminClient();
   const { data: existing } = await db
     .from("waitlist_signups")
-    .select("id, confirm_token, confirmed_at")
+    .select("id, confirm_token, confirmed_at, confirm_sent_at")
     .eq("email", parsed.value.email)
     .maybeSingle();
 
@@ -38,8 +38,11 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     token = data.confirm_token;
   }
 
-  if (token && !existing?.confirmed_at) {
+  // Resend the confirmation at most once an hour, so the form can't be used to flood an inbox.
+  const recentlySent = existing?.confirm_sent_at && Date.parse(existing.confirm_sent_at) > Date.now() - 3600_000;
+  if (token && !existing?.confirmed_at && !recentlySent) {
     await sendEmail(waitlistConfirmEmail(parsed.value.email, `${siteUrl}/waitlist/confirm?token=${token}`, parsed.value.role));
+    await db.from("waitlist_signups").update({ confirm_sent_at: new Date().toISOString() }).eq("email", parsed.value.email);
   }
   return { status: "done", message: `Check ${parsed.value.email} and tap the link to confirm your spot.` };
 }

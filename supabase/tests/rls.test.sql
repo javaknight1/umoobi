@@ -1,7 +1,7 @@
 -- Row-level security: what the filmmaker, a buyer, a stranger, staff and anonymous visitors can reach.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(30);
+select plan(31);
 
 -- Start from an empty database (seed data is restored by the rollback).
 truncate auth.users, public.waitlist_signups, public.shelves, public.jobs, public.webhook_events cascade;
@@ -101,6 +101,10 @@ reset role;
 
 -- ─── Staff ──────────────────────────────────────────────────────────────────
 select pg_temp.act_as('00000000-0000-0000-0000-00000000000d');
+select is((select count(*)::int from public.waitlist_signups), 0, 'staff without a second factor (aal1) see nothing');
+reset role;
+select set_config('request.jwt.claims', json_build_object('sub', '00000000-0000-0000-0000-00000000000d', 'role', 'authenticated', 'aal', 'aal2')::text, true);
+set local role authenticated;
 select is((select count(*)::int from public.waitlist_signups), 1, 'staff read the waitlist');
 select is((select count(*)::int from public.films), 2, 'staff see drafts');
 select is((select count(*)::int from public.staff_audit_log), 0, 'only admins read the audit log');

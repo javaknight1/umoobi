@@ -883,6 +883,7 @@ export type Database = {
           id: string
           invite_email: string | null
           invite_token: string | null
+          invited_at: string | null
           name: string
           photo_url: string | null
           slug: string
@@ -896,6 +897,7 @@ export type Database = {
           id?: string
           invite_email?: string | null
           invite_token?: string | null
+          invited_at?: string | null
           name: string
           photo_url?: string | null
           slug: string
@@ -909,6 +911,7 @@ export type Database = {
           id?: string
           invite_email?: string | null
           invite_token?: string | null
+          invited_at?: string | null
           name?: string
           photo_url?: string | null
           slug?: string
@@ -1306,6 +1309,7 @@ export type Database = {
       }
       waitlist_signups: {
         Row: {
+          confirm_sent_at: string | null
           confirm_token: string
           confirmed_at: string | null
           created_at: string
@@ -1320,6 +1324,7 @@ export type Database = {
           trailer_url: string | null
         }
         Insert: {
+          confirm_sent_at?: string | null
           confirm_token?: string
           confirmed_at?: string | null
           created_at?: string
@@ -1334,6 +1339,7 @@ export type Database = {
           trailer_url?: string | null
         }
         Update: {
+          confirm_sent_at?: string | null
           confirm_token?: string
           confirmed_at?: string | null
           created_at?: string

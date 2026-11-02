@@ -1,7 +1,7 @@
 import { LICENSE_STATEMENT, rentalWindowLabel } from "@/lib/library/format";
 import { formatCents } from "@/lib/money";
 import type { Email } from "./index";
-import { button, layout } from "./templates";
+import { button, layout, esc } from "./templates";
 
 export interface ReceiptData {
   to: string;
@@ -15,7 +15,6 @@ export interface ReceiptData {
   libraryUrl: string;
 }
 
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Purchase or rental receipt. Purchases repeat the license statement (AB 2426). */
 export function receiptEmail(d: ReceiptData): Email {

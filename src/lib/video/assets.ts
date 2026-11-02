@@ -31,9 +31,18 @@ export async function markAssetReady(
   }
 
   if (row.kind === "master") {
-    const { data: film } = await db.from("films").select("runtime_seconds").eq("id", row.film_id).single();
-    if (film && film.runtime_seconds === null && info.durationSeconds) {
-      await db.from("films").update({ runtime_seconds: Math.round(info.durationSeconds) }).eq("id", row.film_id);
+    // The encoded duration is the real runtime; it replaces whatever was typed, so a feature
+    // can't be declared as a short to dodge the yearly limits (D13). The cap and free-offer
+    // triggers re-check against it.
+    if (info.durationSeconds) {
+      const { error: runtimeError } = await db
+        .from("films")
+        .update({ runtime_seconds: Math.round(info.durationSeconds) })
+        .eq("id", row.film_id);
+      if (runtimeError) {
+        await markAssetErrored(assetRowId, runtimeError.message);
+        return;
+      }
     }
     await enqueue("check_film", { film_id: row.film_id });
   }
