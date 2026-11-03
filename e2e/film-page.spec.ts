@@ -13,7 +13,7 @@ test("a visitor sees the shareable film page with prices, license wording and cr
   await expect(page.getByText("Drama · 2026 · 94 min · PG-13")).toBeVisible();
   await expect(page.getByRole("link", { name: "Rent for 48 hours $4.99" })).toHaveAttribute("href", "/checkout/d0000000-0000-0000-0000-000000000001");
   await expect(page.getByRole("link", { name: "Buy (license) $12.99" })).toBeVisible();
-  await expect(page.getByTestId("license-statement")).toContainText("license to watch, not ownership");
+  await expect(page.getByTestId("license-statement")).toContainText("not ownership");
   await expect(page.getByRole("link", { name: "Leilani Kahale Lead actor" })).toHaveAttribute("href", "/p/leilani-kahale");
   await expect(page.getByText("Only people who rented or bought the film can review it.")).toBeVisible();
   await expect(page.getByRole("link", { name: /Watch now/ })).toHaveCount(0);

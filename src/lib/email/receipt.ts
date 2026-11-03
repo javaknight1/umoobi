@@ -50,8 +50,8 @@ export function receiptEmail(d: ReceiptData): Email {
     html: layout(
       `${what}: ${esc(d.filmTitle)}`,
       `<table style="width:100%;border-collapse:collapse;font-size:14px">${rows}</table>
-<p style="font-size:14px;color:#6b645a">${esc(note)}</p>${button(d.libraryUrl, "Open your library")}
-<p style="font-size:12px;color:#6b645a">Order ${d.orderId}</p>`,
+<p style="font-size:14px;color:#5d5a78">${esc(note)}</p>${button(d.libraryUrl, "Open your library")}
+<p style="font-size:12px;color:#5d5a78">Order ${d.orderId}</p>`,
     ),
   };
 }

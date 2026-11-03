@@ -8,17 +8,17 @@ export function esc(s: string): string {
 
 /** Minimal, accessible HTML wrapper shared by every transactional email. */
 export function layout(title: string, bodyHtml: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#f6f3ec;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#17140f">
+  return `<!doctype html><html><body style="margin:0;background:#efeef5;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1730">
 <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-<p style="font-family:Georgia,serif;font-size:22px;margin:0 0 24px">${siteName}</p>
+<p style="font-size:22px;font-weight:700;margin:0 0 24px"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#ffad33;margin-right:6px"></span>${siteName.toLowerCase()}</p>
 <h1 style="font-size:20px;margin:0 0 16px">${title}</h1>
 ${bodyHtml}
-<p style="color:#6b645a;font-size:12px;margin-top:32px">You're getting this because this address was entered on ${siteName}. If that wasn't you, ignore it.</p>
+<p style="color:#5d5a78;font-size:12px;margin-top:32px">You're getting this because this address was entered on ${siteName}. If that wasn't you, ignore it.</p>
 </div></body></html>`;
 }
 
 export function button(href: string, label: string): string {
-  return `<p><a href="${href}" style="display:inline-block;background:#c2410c;color:#fff;text-decoration:none;padding:12px 20px;border-radius:999px;font-weight:600">${label}</a></p>`;
+  return `<p><a href="${href}" style="display:inline-block;background:#ffad33;color:#1a1730;text-decoration:none;padding:12px 20px;border-radius:999px;font-weight:600">${label}</a></p>`;
 }
 
 export function waitlistConfirmEmail(to: string, confirmUrl: string, role: string): Email {

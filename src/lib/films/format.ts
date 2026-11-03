@@ -44,6 +44,5 @@ export function sortOffers<T extends OfferLike>(offers: T[]): T[] {
   return [...offers].sort((a, b) => (a.kind === b.kind ? a.price_cents - b.price_cents : a.kind === "rent" ? -1 : 1));
 }
 
-/** Shown next to every Buy button and at checkout (AB 2426, D39). */
-export const LICENSE_STATEMENT =
-  "Buying gets you a license to watch, not ownership. If the filmmaker pulls the film or Umoobi closes, access can end.";
+/** Shown next to every Buy button, at checkout and on receipts (AB 2426, D39). */
+export { LICENSE_STATEMENT } from "@/lib/library/format";
