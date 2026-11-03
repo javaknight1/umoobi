@@ -1,6 +1,6 @@
 # Umoobi Build Progress Tracker
 
-**Last Updated:** 2026-11-02
+**Last Updated:** 2026-11-03
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
 **Current Task:** T020 hardening: load test, DRM plan and beta onboarding need the deployed app (blocked on Supabase + Vercel)
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
@@ -445,7 +445,12 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 - Security fixes in T020 so far: money functions locked to the service role; only paying viewers' AI reports hide a film (D66); staff e2e runs real TOTP.
 - UI reskinned to Rob's 17 mockups (navy/amber viewer, lavender studio with sidebar, Bricolage Grotesque, generated posters).
 - Security review: 12 findings fixed (see commit "fix: security review findings (T020)"); CI pinned to Supabase CLI 2.75.0.
-- Decisions D48–D67 are in the Notion Decisions page.
+- 2026-11-03 (without Rob): waitlist launch stage (D68) and closed-beta invites (D69); robots + sitemap; share cards;
+  axe accessibility checks (all key pages pass WCAG 2.1 AA serious/critical); server-side Sentry scrubbed for VPPA;
+  page-view dedupe; proxy skips auth for anonymous visitors (landing ~8x faster locally); load-test script;
+  mocked Stripe/Mux request-shape tests; DRM switch-on plan (docs/DRM.md).
+- Stripe sandbox creation was blocked by the permission system; Rob needs to approve or create a Stripe sandbox.
+- Decisions D48–D69 are in the Notion Decisions page.
 
 ## Blocked — needs Rob
 
@@ -453,7 +458,7 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 |---|---|---|---|
 | T001, T002 | Cloud Supabase project | Both free slots are used: approve Supabase Pro (~$25/mo) or pause a project to free a slot | Local Supabase |
 | T001, T002 | Vercel login | Run `! vercel login` (stored token expired), then follow docs/DEPLOY.md | — |
-| T003, T004, T011 | Stripe account for Umoobi + test keys | Create the account, save keys to Bitwarden as `Stripe (Umoobi)` | Dev payments provider |
+| T003, T004, T011 | Stripe sandbox for Umoobi + test keys | Approve `stripe --project-name umoobi sandbox create` (blocked by the permission classifier), or create a sandbox in the Stripe dashboard and save keys to Bitwarden as `Stripe (Umoobi)` | Dev payments provider |
 | T005, T006, T013 | Mux account + token + signing key | Sign up, save to Bitwarden as `Mux` | Dev video provider (public test HLS stream) |
 | T007, T009 | Sightengine account | Sign up (Starter $29/mo), save to Bitwarden | Dev scanner (always clean, deterministic) |
 | T008 | TMDB commercial license terms | Email TMDB | Matcher runs with the existing key |
