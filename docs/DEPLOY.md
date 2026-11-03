@@ -25,6 +25,7 @@ Hosting: Vercel (app + cron) and Supabase (Postgres, Auth). DNS for sharkfins.xy
    vercel env add SUPABASE_SERVICE_ROLE_KEY production
    vercel env add CRON_SECRET production              # bwx generate -ulns --length 32
    vercel env add RESEND_API_KEY production           # optional until the sending domain is verified
+   vercel env add NEXT_PUBLIC_LAUNCH_STAGE production # "waitlist" until Stripe and Mux exist
    vercel domains add umoobi.sharkfins.xyz
    vercel --prod
    ```
@@ -36,11 +37,13 @@ Hosting: Vercel (app + cron) and Supabase (Postgres, Auth). DNS for sharkfins.xy
 
 4. **Email**: verify `umoobi.sharkfins.xyz` (or the final domain) as a Resend sending domain; set `EMAIL_FROM`.
 
-## Without Stripe, Mux or Sightengine
+## Waitlist-only launch (no Stripe, Mux or Sightengine yet)
 
-Production refuses the dev providers (they're only allowed outside production or with `ALLOW_DEV_PROVIDERS=true`).
-For a waitlist-only launch that's fine: the landing page, waitlist, confirmation email, Vimeo guide, legal pages
-and staff waitlist view need only Supabase and Resend. Don't set `ALLOW_DEV_PROVIDERS` in production.
+Set `NEXT_PUBLIC_LAUNCH_STAGE=waitlist` (D68). The proxy then serves only the landing page, waitlist, confirmation
+email, Vimeo guide, legal and copyright pages, sign-in and the staff waitlist view; every marketplace route
+redirects to `/`, so nothing touches the payment or video providers. These pages need only Supabase and Resend.
+Switch to `full` once Stripe and Mux are configured. Production refuses the dev providers (only allowed outside
+production or with `ALLOW_DEV_PROVIDERS=true`); never set that in production.
 
 ## After each deploy
 

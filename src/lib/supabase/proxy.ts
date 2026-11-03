@@ -1,11 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { launchStage, openDuringWaitlist } from "@/lib/launch";
 
 /** Pages that need a signed-in user. Data is still protected by row-level security; this only saves a round trip. */
 const MEMBER_PATHS = ["/library", "/studio", "/staff", "/settings", "/filmmakers/apply", "/watch"];
 
 /** Refreshes the Supabase session cookie on every request so Server Components see a valid user. */
 export async function updateSession(request: NextRequest) {
+  // Before launch only the pre-launch pages exist; everything else goes to the landing page.
+  if (launchStage === "waitlist" && !openDuringWaitlist(request.nextUrl.pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

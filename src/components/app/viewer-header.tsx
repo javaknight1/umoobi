@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Logo } from "@/components/brand";
+import { launchStage } from "@/lib/launch";
 import { UserMenu } from "./user-menu";
 
 const NAV = [
@@ -17,6 +18,17 @@ export function ViewerHeader() {
     <header className="theater sticky top-0 z-20 border-b border-line bg-bg/95 backdrop-blur">
       <div className="mx-auto flex max-w-[90rem] items-center gap-6 px-4 py-3.5 sm:px-8">
         <Logo />
+        {launchStage === "waitlist" ? (
+          <div className="ml-auto flex items-center gap-5 text-[0.95rem]">
+            <Link href="/guides/leaving-vimeo-on-demand" className="hidden text-muted hover:text-fg sm:inline">
+              Leaving Vimeo On Demand?
+            </Link>
+            <Link href="/#waitlist" className="btn-primary px-5 py-2">
+              Join the waitlist
+            </Link>
+          </div>
+        ) : (
+          <>
         <nav aria-label="Browse" className="hidden items-center gap-6 text-[0.95rem] text-muted lg:flex">
           {NAV.map(([href, label]) => (
             <Link key={label} href={href} className="hover:text-fg">
@@ -35,6 +47,8 @@ export function ViewerHeader() {
             <UserMenu />
           </Suspense>
         </div>
+          </>
+        )}
       </div>
     </header>
   );

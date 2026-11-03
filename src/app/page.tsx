@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { launchStage } from "@/lib/launch";
 import { Suspense } from "react";
 import { Avatar, Poster } from "@/components/brand";
 import { MarketingShell } from "@/components/marketing/site-header";
@@ -61,9 +62,15 @@ export default function Home() {
               <Link href="#waitlist" className="btn-primary px-7 py-3.5 text-base">
                 Join the waitlist
               </Link>
-              <Link href="/discover" className="btn-ghost px-7 py-3.5 text-base">
-                Browse films
-              </Link>
+              {launchStage === "full" ? (
+                <Link href="/discover" className="btn-ghost px-7 py-3.5 text-base">
+                  Browse films
+                </Link>
+              ) : (
+                <Link href="/guides/leaving-vimeo-on-demand" className="btn-ghost px-7 py-3.5 text-base">
+                  Leaving Vimeo On Demand?
+                </Link>
+              )}
             </div>
             <dl className="mt-2 grid max-w-xl grid-cols-2 gap-6">
               <div>
@@ -208,9 +215,11 @@ export default function Home() {
               We&apos;re opening a closed beta for 10 filmmakers in 2027, then widening it. Tell us about your film and
               we&apos;ll be in touch. We&apos;ll only email you to confirm your address unless you tick the box.
             </p>
-            <Link href="/filmmakers/apply" className="text-sm text-accent hover:underline">
-              Already invited? Apply as a filmmaker →
-            </Link>
+            {launchStage === "full" ? (
+              <Link href="/filmmakers/apply" className="text-sm text-accent hover:underline">
+                Already invited? Apply as a filmmaker →
+              </Link>
+            ) : null}
           </div>
           <Suspense fallback={<div className="card h-96" />}>
             <WaitlistForm />
