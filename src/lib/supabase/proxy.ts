@@ -13,6 +13,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  const { pathname, search } = request.nextUrl;
+  const memberPath = MEMBER_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+  // Anonymous visitors (most traffic from shared film links) have no session to refresh, so
+  // skip the auth round trip entirely.
+  if (!request.cookies.getAll().some((c) => c.name.startsWith("sb-"))) {
+    if (memberPath) {
+      const signIn = new URL("/sign-in", request.url);
+      signIn.searchParams.set("next", pathname + search);
+      return NextResponse.redirect(signIn);
+    }
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -38,10 +52,9 @@ export async function updateSession(request: NextRequest) {
   // Don't run code between createServerClient and getClaims: it validates and refreshes the token.
   const { data, error } = await supabase.auth.getClaims();
 
-  const { pathname, search } = request.nextUrl;
   // If the auth server is slow or unreachable, don't treat the visitor as signed out: the page's
   // own requireUser check decides, so a hiccup doesn't bounce signed-in users to sign-in.
-  if (!data?.claims && !isAuthRetryableFetchError(error) && MEMBER_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  if (!data?.claims && !isAuthRetryableFetchError(error) && memberPath) {
     const signIn = new URL("/sign-in", request.url);
     signIn.searchParams.set("next", pathname + search);
     return NextResponse.redirect(signIn);
