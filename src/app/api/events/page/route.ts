@@ -23,7 +23,20 @@ export async function POST(request: NextRequest) {
 
   const db = createAdminClient();
   const { data: film } = await db.from("films").select("id").eq("id", filmId).eq("status", "published").maybeSingle();
-  if (film) {
+  // One view or trailer play per session, film and half hour: reloads and scripts can't
+  // inflate the funnel or push a film into Trending.
+  let duplicate = false;
+  if (film && !fresh) {
+    const { count } = await db
+      .from("page_events")
+      .select("id", { count: "exact", head: true })
+      .eq("session_id", sid!)
+      .eq("film_id", filmId)
+      .eq("event", event as "view" | "trailer_play")
+      .gt("created_at", new Date(Date.now() - 30 * 60_000).toISOString());
+    duplicate = (count ?? 0) > 0;
+  }
+  if (film && !duplicate) {
     await db.from("page_events").insert({
       session_id: sid!,
       film_id: filmId,

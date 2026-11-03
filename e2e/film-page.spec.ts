@@ -145,3 +145,13 @@ test("person and filmmaker pages list their films", async ({ page }) => {
   await expect(page.getByRole("link", { name: /Salt & Static/ })).toBeVisible();
   await expect(page.getByText("Low Water")).toHaveCount(0); // drafts stay private
 });
+
+test("a reload in the same session counts one view, not two", async ({ page }) => {
+  const src = `dedupe-${Date.now()}`;
+  const post = () => page.request.post("/api/events/page", { data: { filmId: SALT, event: "view", ref: src } });
+  await post(); // first call sets the session cookie and records the view
+  await post();
+  await post();
+  const { count } = await admin.from("page_events").select("id", { count: "exact", head: true }).eq("film_id", SALT).eq("source", src);
+  expect(count).toBe(1);
+});
