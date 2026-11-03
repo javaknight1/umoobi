@@ -3,7 +3,7 @@ import { openDuringWaitlist } from "./launch";
 
 describe("openDuringWaitlist", () => {
   it("serves the pre-launch pages", () => {
-    for (const p of ["/", "/waitlist/confirm", "/waitlist/confirmed", "/guides/leaving-vimeo-on-demand", "/legal/terms", "/dmca", "/sign-in", "/auth/callback", "/staff/waitlist", "/staff/waitlist/export", "/settings/security"]) {
+    for (const p of ["/", "/waitlist/confirm", "/waitlist/confirmed", "/guides/leaving-vimeo-on-demand", "/legal/terms", "/dmca", "/sign-in", "/auth/callback", "/staff/waitlist", "/staff/waitlist/export", "/settings/security", "/robots.txt", "/sitemap.xml"]) {
       expect(openDuringWaitlist(p), p).toBe(true);
     }
   });

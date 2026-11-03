@@ -19,6 +19,8 @@ const WAITLIST_PATHS = [
   "/staff/waitlist",
   "/api/cron",
   "/api/dev/outbox",
+  "/robots.txt",
+  "/sitemap.xml",
 ];
 
 /** Whether a path is served during the waitlist stage. */
