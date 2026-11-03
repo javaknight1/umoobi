@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- untyped mocked SDK payloads */
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
