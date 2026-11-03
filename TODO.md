@@ -1,8 +1,8 @@
 # Umoobi Build Progress Tracker
 
-**Last Updated:** 2026-10-30
+**Last Updated:** 2026-11-02
 **Total Tasks:** T001–T033 (20 build tasks mapped to N1–N12 and spikes S1–S7, 13 ops tasks)
-**Current Task:** UI reskin to the 17 mockups (in progress), then T020 hardening
+**Current Task:** T020 hardening: load test, DRM plan and beta onboarding need the deployed app (blocked on Supabase + Vercel)
 **Current Sprint:** S1 (Foundation + waitlist) — In Progress
 **Next Milestone:** Waitlist live by 2026-11-13 (before Vimeo On Demand storefronts go offline 2026-11-20); Gate 1 on 2027-07-30
 
@@ -443,7 +443,9 @@ N-phase mapping: N1 → T001 · N11a → T002 · N2 → T004 · N3 → T006 · N
 - Built, blocked on vendor accounts: T001/T002 (Supabase + Vercel for deploy), T004 + T011 + T021 (Stripe), T006 + T013 (Mux), T009 (Sightengine, TMDB terms).
 - Repo: https://github.com/javaknight1/umoobi (public). CI: lint, type-check, unit (60), pgTAP (124), Playwright (93).
 - Security fixes in T020 so far: money functions locked to the service role; only paying viewers' AI reports hide a film (D66); staff e2e runs real TOTP.
-- Decisions D48–D66 are in the Notion Decisions page.
+- UI reskinned to Rob's 17 mockups (navy/amber viewer, lavender studio with sidebar, Bricolage Grotesque, generated posters).
+- Security review: 12 findings fixed (see commit "fix: security review findings (T020)"); CI pinned to Supabase CLI 2.75.0.
+- Decisions D48–D67 are in the Notion Decisions page.
 
 ## Blocked — needs Rob
 
