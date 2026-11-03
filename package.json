@@ -19,6 +19,7 @@
     "@mux/mux-node": "^15.5.0",
     "@mux/mux-player-react": "^3.14.1",
     "@mux/upchunk": "^3.5.0",
+    "@sentry/node": "^11.10.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "next": "16.4.3",
