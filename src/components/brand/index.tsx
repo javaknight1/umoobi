@@ -72,12 +72,18 @@ function motifFor(slug: string, title: string): Motif {
 }
 
 /** Background and title colors of a film's generated poster, for hero panels. */
+/** Palette and motif of a film's generated poster, for share images. */
+export function posterArt(slug: string, title: string) {
+  const motif = motifFor(slug, title);
+  return { motif, ...PALETTES[motif] };
+}
+
 export function posterColors(slug: string, title: string): { bg: string; title: string } {
   const p = PALETTES[motifFor(slug, title)];
   return { bg: p.bg === "#1c2a4a" ? "#2a3a5c" : p.bg, title: p.title };
 }
 
-function Shape({ m, ink }: { m: Motif; ink: string }) {
+export function PosterShape({ m, ink }: { m: Motif; ink: string }) {
   switch (m) {
     case "sun":
       return (
@@ -190,7 +196,7 @@ export function Poster({
       style={{ background: m === "ferry" ? "#e9dcbc" : p.bg, containerType: "inline-size" }}
     >
       <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice">
-        <Shape m={m} ink={p.ink} />
+        <PosterShape m={m} ink={p.ink} />
       </svg>
       {bare ? null : (
         <p

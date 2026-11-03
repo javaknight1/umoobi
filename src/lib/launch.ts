@@ -20,6 +20,7 @@ const WAITLIST_PATHS = [
   "/api/cron",
   "/api/dev/outbox",
   "/robots.txt",
+  "/opengraph-image",
   "/sitemap.xml",
 ];
 

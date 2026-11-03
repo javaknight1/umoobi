@@ -30,7 +30,6 @@ export async function generateMetadata({ params }: PageProps<"/f/[slug]">): Prom
       title: film.title,
       description,
       url: `/f/${film.slug}`,
-      ...(film.poster_url ? { images: [{ url: film.poster_url }] } : {}),
     },
     twitter: { card: film.poster_url ? "summary_large_image" : "summary", title: film.title, description },
   };
