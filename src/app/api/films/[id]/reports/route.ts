@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +17,10 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/films/[
   if (!REASONS.has(reason)) return NextResponse.json({ error: "Pick a reason." }, { status: 400 });
   const details = body?.details ? String(body.details).slice(0, 2000) : null;
 
-  const { data: auth } = await (await createClient()).auth.getUser();
+  const { data: auth, error: authError } = await (await createClient()).auth.getUser();
+  // If we can't tell who's reporting (auth timeout), ask the client to retry rather than
+  // silently treating a buyer as a stranger.
+  if (isAuthRetryableFetchError(authError)) return NextResponse.json({ error: "Try again in a moment." }, { status: 503 });
   const db = createAdminClient();
   const { data: film } = await db.from("films").select("id, account_id, status, ai_generated").eq("id", id).maybeSingle();
   if (!film || film.status !== "published") return NextResponse.json({ error: "Film not found." }, { status: 404 });

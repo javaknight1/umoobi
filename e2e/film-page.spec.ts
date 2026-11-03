@@ -95,8 +95,17 @@ async function sendAiReport(page: import("@playwright/test").Page, slug: string)
   await page.goto(`/f/${slug}`);
   await page.getByText("Report this film").click();
   await page.getByLabel("Uses AI-generated imagery without a label").check();
-  await page.getByRole("button", { name: "Send report" }).click();
-  await expect(page.getByText("Umoobi staff will look at this within 24 hours.")).toBeVisible();
+  const thanks = page.getByText("Umoobi staff will look at this within 24 hours.");
+  // The route asks for a retry when the auth server is slow; the form shows an error then.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.getByRole("button", { name: "Send report" }).click();
+    const outcome = await Promise.race([
+      thanks.waitFor().then(() => "sent"),
+      page.getByRole("alert").filter({ hasText: "Try again" }).waitFor().then(() => "retry"),
+    ]);
+    if (outcome === "sent") return;
+  }
+  await expect(thanks).toBeVisible();
 }
 
 test("a stranger's undisclosed-AI report queues a staff review but doesn't hide the film (D66)", async ({ page }, info) => {

@@ -14,6 +14,7 @@ export function ReportForm({ filmId }: { filmId: string }) {
   const [reason, setReason] = useState<string>("undisclosed_ai");
   const [details, setDetails] = useState("");
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
   const [pending, start] = useTransition();
 
   if (done) return <p className="text-sm text-ok">Thanks. Umoobi staff will look at this within 24 hours.</p>;
@@ -25,6 +26,7 @@ export function ReportForm({ filmId }: { filmId: string }) {
         className="mt-3 grid gap-2"
         onSubmit={(e) => {
           e.preventDefault();
+          setError("");
           start(async () => {
             const res = await fetch(`/api/films/${filmId}/reports`, {
               method: "POST",
@@ -32,6 +34,7 @@ export function ReportForm({ filmId }: { filmId: string }) {
               body: JSON.stringify({ reason, details }),
             });
             if (res.ok) setDone(true);
+            else setError("Couldn't send the report. Try again.");
           });
         }}
       >
@@ -59,6 +62,11 @@ export function ReportForm({ filmId }: { filmId: string }) {
         <button disabled={pending} className="btn-ghost justify-self-start">
           Send report
         </button>
+        {error ? (
+          <p role="alert" className="text-sm text-bad">
+            {error}
+          </p>
+        ) : null}
       </form>
     </details>
   );
