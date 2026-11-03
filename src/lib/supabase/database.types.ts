@@ -1309,6 +1309,8 @@ export type Database = {
       }
       waitlist_signups: {
         Row: {
+          beta_invite_token: string | null
+          beta_invited_at: string | null
           confirm_sent_at: string | null
           confirm_token: string
           confirmed_at: string | null
@@ -1324,6 +1326,8 @@ export type Database = {
           trailer_url: string | null
         }
         Insert: {
+          beta_invite_token?: string | null
+          beta_invited_at?: string | null
           confirm_sent_at?: string | null
           confirm_token?: string
           confirmed_at?: string | null
@@ -1339,6 +1343,8 @@ export type Database = {
           trailer_url?: string | null
         }
         Update: {
+          beta_invite_token?: string | null
+          beta_invited_at?: string | null
           confirm_sent_at?: string | null
           confirm_token?: string
           confirmed_at?: string | null
@@ -1524,6 +1530,7 @@ export type Database = {
         Args: { p_error?: string; p_id: number }
         Returns: undefined
       }
+      has_beta_invite: { Args: never; Returns: boolean }
       has_role: { Args: { r: string }; Returns: boolean }
       is_account_member: { Args: { a: string }; Returns: boolean }
       mark_payout_paid: {

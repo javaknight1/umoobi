@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { admin, signInAs, signInStaff } from "./db";
-import { uniqueEmail } from "./helpers";
+import { appEmail, uniqueEmail } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -56,4 +56,17 @@ test("staff hold and release a filmmaker's payouts", async ({ page }, info) => {
 test("viewers can't reach staff tools", async ({ page }) => {
   await signInAs(page, uniqueEmail("viewer"), { next: "/staff/takedowns" });
   await expect(page).not.toHaveURL(/\/staff/);
+});
+
+test("staff invite a confirmed filmmaker from the waitlist to the closed beta", async ({ page, request }, info) => {
+  test.skip(info.project.name !== "desktop", "one run is enough");
+  const email = uniqueEmail("beta");
+  await admin.from("waitlist_signups").insert({ email, role: "filmmaker", film_title: "Beta Film", confirmed_at: new Date().toISOString() });
+  await signInStaff(page, "/staff/waitlist");
+  const row = page.locator("tr", { hasText: email });
+  await row.getByRole("button", { name: "Invite to beta" }).click();
+  await expect(row).toContainText("Invited");
+  const mail = await appEmail(request, email);
+  expect(mail.subject).toBe("You're invited to the Umoobi closed beta");
+  expect(mail.text).toMatch(/\/filmmakers\/apply\?invite=/);
 });

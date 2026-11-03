@@ -33,3 +33,17 @@ export function waitlistConfirmEmail(to: string, confirmUrl: string, role: strin
     html: layout("Confirm your spot", `<p>${intro}</p>${button(confirmUrl, "Confirm my email")}`),
   };
 }
+
+export function betaInviteEmail(to: string, applyUrl: string, filmTitle: string | null): Email {
+  const film = filmTitle ? ` with ${esc(filmTitle)}` : "";
+  const filmText = filmTitle ? ` with ${filmTitle}` : "";
+  return {
+    to,
+    subject: "You're invited to the Umoobi closed beta",
+    text: `You're one of the first filmmakers invited to sell on Umoobi${filmText}. Apply here (sign in with this email address): ${applyUrl}\n`,
+    html: layout(
+      "You're invited to the closed beta",
+      `<p>You're one of the first filmmakers invited to sell on Umoobi${film}. The application takes about ten minutes: a few details, an ID check and your payout account.</p><p>Sign in with this email address so we can match your invite.</p>${button(applyUrl, "Start my application")}`,
+    ),
+  };
+}

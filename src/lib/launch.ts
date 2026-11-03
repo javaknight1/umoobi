@@ -1,11 +1,15 @@
 /**
- * Launch stage. "waitlist" serves only the public pre-launch pages (landing, waitlist,
+ * Launch stage. "beta" is the full site with invite-only filmmaker applications. "waitlist" serves only the public pre-launch pages (landing, waitlist,
  * Vimeo guide, legal, copyright, sign-in for staff) so the site can go live with just
  * Supabase and Resend, before Stripe, Mux or Sightengine exist (D33, D68).
  */
-export type LaunchStage = "waitlist" | "full";
+export type LaunchStage = "waitlist" | "beta" | "full";
 
-export const launchStage: LaunchStage = process.env.NEXT_PUBLIC_LAUNCH_STAGE === "waitlist" ? "waitlist" : "full";
+export const launchStage: LaunchStage =
+  process.env.NEXT_PUBLIC_LAUNCH_STAGE === "waitlist" ? "waitlist" : process.env.NEXT_PUBLIC_LAUNCH_STAGE === "beta" ? "beta" : "full";
+
+/** In the closed beta only invited filmmakers can apply (Gate 2: 10 beta filmmakers). */
+export const applicationsNeedInvite = launchStage === "beta";
 
 const WAITLIST_PATHS = [
   "/",

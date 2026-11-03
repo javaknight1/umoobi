@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { requireStaff } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { ROLE_LABELS, type WaitlistRole } from "@/lib/waitlist";
+import { inviteToBeta } from "./actions";
 
 export const metadata: Metadata = { title: "Waitlist · Staff", robots: { index: false } };
 
@@ -28,7 +29,7 @@ async function Stats() {
   const supabase = await createClient();
   const { data: rows } = await supabase
     .from("waitlist_signups")
-    .select("email, role, film_title, film_kind, sells_today, source, confirmed_at, created_at")
+    .select("email, role, film_title, film_kind, sells_today, source, confirmed_at, created_at, beta_invited_at")
     .order("created_at", { ascending: false });
   const all = rows ?? [];
   const confirmed = all.filter((r) => r.confirmed_at);
@@ -43,11 +44,12 @@ async function Stats() {
 
   return (
     <div className="mt-8 grid gap-8">
-      <div className="grid gap-4 sm:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-5">
         <Stat label="Confirmed" value={confirmed.length} />
         <Stat label="Filmmakers" value={confirmed.filter((r) => r.role === "filmmaker").length} />
         <Stat label="Unconfirmed" value={all.length - confirmed.length} />
         <Stat label="Goal by Jan 31, 2027" value="300 filmmakers" />
+        <Stat label="Beta invites" value={`${all.filter((r) => r.beta_invited_at).length} of 10`} />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         <Breakdown title="By role" rows={count((r) => ROLE_LABELS[r.role as WaitlistRole])} />
@@ -58,7 +60,7 @@ async function Stats() {
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="text-muted">
             <tr className="border-b border-line">
-              {["Email", "Role", "Film", "Source", "Confirmed", "Joined"].map((h) => (
+              {["Email", "Role", "Film", "Source", "Confirmed", "Joined", "Beta"].map((h) => (
                 <th key={h} className="px-4 py-2 font-medium">
                   {h}
                 </th>
@@ -74,6 +76,18 @@ async function Stats() {
                 <td className="px-4 py-2">{r.source ?? "—"}</td>
                 <td className="px-4 py-2">{r.confirmed_at ? "Yes" : "No"}</td>
                 <td className="px-4 py-2">{r.created_at.slice(0, 10)}</td>
+                <td className="px-4 py-2">
+                  {r.beta_invited_at ? (
+                    <span className="text-muted">Invited {r.beta_invited_at.slice(0, 10)}</span>
+                  ) : r.role === "filmmaker" && r.confirmed_at ? (
+                    <form action={inviteToBeta}>
+                      <input type="hidden" name="email" value={r.email} />
+                      <button className="btn-ghost px-3 py-1 text-xs">Invite to beta</button>
+                    </form>
+                  ) : (
+                    "—"
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

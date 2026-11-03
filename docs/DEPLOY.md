@@ -42,7 +42,8 @@ Hosting: Vercel (app + cron) and Supabase (Postgres, Auth). DNS for sharkfins.xy
 Set `NEXT_PUBLIC_LAUNCH_STAGE=waitlist` (D68). The proxy then serves only the landing page, waitlist, confirmation
 email, Vimeo guide, legal and copyright pages, sign-in and the staff waitlist view; every marketplace route
 redirects to `/`, so nothing touches the payment or video providers. These pages need only Supabase and Resend.
-Switch to `full` once Stripe and Mux are configured. Production refuses the dev providers (only allowed outside
+Then `beta` (D69): the full site, but only filmmakers invited from the staff waitlist view (/staff/waitlist,
+"Invite to beta") can apply, matched by email. Switch to `full` after Gate 2. Production refuses the dev providers (only allowed outside
 production or with `ALLOW_DEV_PROVIDERS=true`); never set that in production.
 
 ## After each deploy

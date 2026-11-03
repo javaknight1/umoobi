@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
+import { applicationsNeedInvite } from "@/lib/launch";
 import { payments } from "@/lib/payments";
 import { siteUrl } from "@/lib/site";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -37,6 +38,11 @@ export async function saveAbout(_prev: AboutState, form: FormData): Promise<Abou
   };
   const supabase = await createClient();
   const { data: existing } = await supabase.from("filmmaker_accounts").select("id").eq("owner_id", user.id).maybeSingle();
+
+  if (!existing && applicationsNeedInvite) {
+    const { data: invited } = await supabase.rpc("has_beta_invite");
+    if (!invited) return { status: "error", message: "The closed beta is invite-only for now. Join the waitlist and we'll invite you." };
+  }
 
   if (existing) {
     const { error } = await supabase.from("filmmaker_accounts").update(fields).eq("id", existing.id);

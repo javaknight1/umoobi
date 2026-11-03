@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Logo } from "@/components/brand";
 import { requireUser } from "@/lib/auth/session";
+import { applicationsNeedInvite } from "@/lib/launch";
 import { createClient } from "@/lib/supabase/server";
 import { AboutForm } from "./about-form";
 import { startIdentity, startPayouts } from "./actions";
@@ -55,6 +56,24 @@ async function Wizard() {
   const supabase = await createClient();
   const { data: account } = await supabase.from("filmmaker_accounts").select("*").eq("owner_id", user.id).maybeSingle();
   const decided = account && account.status !== "applying";
+  if (!account && applicationsNeedInvite) {
+    const { data: invited } = await supabase.rpc("has_beta_invite");
+    if (!invited) {
+      return (
+        <div className="card mt-8 grid gap-3">
+          <h2 className="font-display text-3xl">The closed beta is invite-only</h2>
+          <p className="text-muted">
+            We&apos;re opening Umoobi to 10 filmmakers first. If you were invited, sign in with the email address the
+            invite went to ({user.email}). Otherwise, join the waitlist and we&apos;ll be in touch.
+          </p>
+          <Link href="/#waitlist" className="btn-primary justify-self-start">
+            Join the waitlist
+          </Link>
+        </div>
+      );
+    }
+  }
+
   const step = decided ? 4 : !account ? 1 : account.identity_status !== "verified" ? 2 : 3;
   const { data: verification } = account
     ? await supabase.from("verifications").select("score, signals").eq("account_id", account.id).eq("subject", "account").order("created_at", { ascending: false }).limit(1).maybeSingle()
