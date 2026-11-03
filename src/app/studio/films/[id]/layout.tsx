@@ -53,7 +53,7 @@ async function FilmHeader({ params }: Pick<LayoutProps<"/studio/films/[id]">, "p
           </Link>
         ) : blocked ? (
           <span className="flex items-center gap-2">
-            <Link href={`/studio/films/${id}/publish`} className="text-sm text-muted underline-offset-2 hover:underline">
+            <Link href={`/studio/films/${id}/publish`} className="text-sm text-muted underline underline-offset-2">
               {blockers!.length} to do
             </Link>
             <button disabled aria-disabled className="btn bg-muted/40 text-white" title={blockers!.join("\n")}>

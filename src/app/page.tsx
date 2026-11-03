@@ -42,7 +42,7 @@ export default function Home() {
     <MarketingShell>
       <div className="border-b border-line bg-surface px-4 py-2 text-center text-sm text-muted">
         Vimeo On Demand takes storefronts offline on <strong className="text-fg">November 20, 2026</strong>.{" "}
-        <Link href="/guides/leaving-vimeo-on-demand" className="text-accent underline-offset-2 hover:underline">
+        <Link href="/guides/leaving-vimeo-on-demand" className="text-accent underline underline-offset-2">
           What to download before then →
         </Link>
       </div>

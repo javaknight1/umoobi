@@ -18,7 +18,7 @@
   --accent-fg: #1a1730;
   --ink: #1a1730;
   --ink-fg: #ffffff;
-  --ok: #1f9e8a;
+  --ok: #12786a;
   --warn: #b26b00;
   --bad: #d23d63;
   --chart: #7a6cf0;
@@ -53,7 +53,7 @@
   --line: #e1dfeb;
   --ink: #1a1730;
   --ink-fg: #ffffff;
-  --ok: #1f9e8a;
+  --ok: #12786a;
   --warn: #b26b00;
   --bad: #d23d63;
   background: var(--surface);

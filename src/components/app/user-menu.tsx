@@ -35,8 +35,11 @@ export async function UserMenu() {
         <span className="sm:hidden">Library</span>
       </Link>
       <details className="relative">
-        <summary className="list-none cursor-pointer rounded-full [&::-webkit-details-marker]:hidden" aria-label="Account menu">
-          <Avatar name={name} size={40} />
+        <summary className="list-none cursor-pointer rounded-full [&::-webkit-details-marker]:hidden">
+          <span aria-hidden>
+            <Avatar name={name} size={40} />
+          </span>
+          <span className="sr-only">Account menu</span>
         </summary>
         <div className="absolute right-0 top-12 z-30 grid w-48 gap-1 rounded-2xl border border-line bg-surface p-2 text-sm shadow-xl">
           <p className="truncate px-3 py-1.5 text-xs text-muted">{user.email}</p>

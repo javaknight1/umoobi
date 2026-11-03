@@ -72,9 +72,9 @@ async function Hero({ film }: { film: FilmCard }) {
   return (
     <section className="relative grid overflow-hidden rounded-3xl md:grid-cols-[1.1fr_1fr]" style={{ background: bg, color: title }}>
       <div className="grid content-center gap-5 p-8 sm:p-12">
-        <p className="font-semibold opacity-85">Trending this week</p>
+        <p className="font-semibold uppercase tracking-widest text-sm">Trending this week</p>
         <p className="font-display text-5xl leading-[0.95] sm:text-7xl">{film.title}</p>
-        {full?.synopsis ? <p className="max-w-xl text-lg opacity-90">{full.synopsis}</p> : null}
+        {full?.synopsis ? <p className="max-w-xl text-lg">{full.synopsis}</p> : null}
         <div className="flex flex-wrap gap-3">
           {first ? (
             <Link href={`/f/${film.slug}`} className="btn bg-accent px-6 py-3 text-base text-accent-fg">
