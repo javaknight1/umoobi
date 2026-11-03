@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { launchStage, openDuringWaitlist } from "@/lib/launch";
 
@@ -35,10 +36,12 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Don't run code between createServerClient and getClaims: it validates and refreshes the token.
-  const { data } = await supabase.auth.getClaims();
+  const { data, error } = await supabase.auth.getClaims();
 
   const { pathname, search } = request.nextUrl;
-  if (!data?.claims && MEMBER_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  // If the auth server is slow or unreachable, don't treat the visitor as signed out: the page's
+  // own requireUser check decides, so a hiccup doesn't bounce signed-in users to sign-in.
+  if (!data?.claims && !isAuthRetryableFetchError(error) && MEMBER_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     const signIn = new URL("/sign-in", request.url);
     signIn.searchParams.set("next", pathname + search);
     return NextResponse.redirect(signIn);
