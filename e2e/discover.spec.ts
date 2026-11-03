@@ -9,8 +9,24 @@ test("discover shows curated, trending, shorts and genre shelves with prices", a
   await expect(staffPicks.getByRole("link", { name: /Salt & Static/ })).toBeVisible();
   await expect(staffPicks.getByText("Rent $4.99 · Buy $12.99")).toBeVisible();
   await expect(page.getByRole("region", { name: "Trending" }).getByTestId("film-card").first()).toBeVisible();
-  await expect(page.getByRole("region", { name: "Shorts" }).getByRole("link", { name: /Tidepool/ })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Shorts" }).getByText("Free")).toBeVisible();
+  // Shorts shows the newest shorts; earlier test runs add many, so check with a film published now.
+  const shorts = page.getByRole("region", { name: "Shorts" });
+  await expect(shorts.getByTestId("film-card").first()).toBeVisible();
+  const title = `Fresh Short ${Date.now()}`;
+  const { data: film } = await admin
+    .from("films")
+    .insert({ account_id: "b0000000-0000-0000-0000-000000000002", slug: `fresh-short-${Date.now()}`, title, runtime_seconds: 240, status: "published", vetting_score: 95, published_at: new Date().toISOString() })
+    .select("id")
+    .single();
+  try {
+    await admin.from("offers").insert({ film_id: film!.id, kind: "buy", price_cents: 0 });
+    await page.reload();
+    await expect(shorts.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    await expect(shorts.getByTestId("film-card").filter({ hasText: title }).getByText("Free")).toBeVisible();
+  } finally {
+    await admin.from("offers").delete().eq("film_id", film!.id);
+    await admin.from("films").delete().eq("id", film!.id);
+  }
   await expect(page.getByRole("region", { name: "Animation" }).getByRole("link", { name: /Paper Orchard/ })).toBeVisible();
 });
 
